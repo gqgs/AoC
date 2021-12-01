@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"math"
 	"os"
 	"strconv"
@@ -39,6 +38,8 @@ func solve() error {
 		values = append(values, next)
 	}
 
+	println("silver:", compare(values))
+
 	var windowed []uint64
 	for i := 0; i < len(values); i++ {
 		if i+2 < len(values) {
@@ -46,7 +47,7 @@ func solve() error {
 		}
 	}
 
-	fmt.Println("increased:", compare(windowed))
+	println("gold:", compare(windowed))
 
 	return nil
 }
