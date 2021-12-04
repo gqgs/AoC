@@ -3,9 +3,24 @@ package main
 import (
 	"bufio"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
 
 func solve() error {
 	file, err := os.Open("day4")
@@ -26,89 +41,98 @@ func solve() error {
 		rows = append(rows, text)
 	}
 
-	var boards []Board
+	drawMap := make(map[string]int, 0)
+	drawSlice := strings.Split(draw, ",")
+	for i, n := range drawSlice {
+		drawMap[n] = i
+	}
+
+	const size = 5
+
+	var boardNumbers [][]string
+	var boards [][]int
 	for len(rows) > 0 {
-		numbers := make([]string, 0, 25)
-		numberIndex := make(map[string]int)
-		var index int
-		for i := 0; i < 5; i++ {
+		numbers := make([]string, 0, size*size)
+		indexes := make([]int, 0, size*size)
+		for i := 0; i < size; i++ {
 			inputNumbers := strings.Split(rows[i], " ")
 			for _, inputNumber := range inputNumbers {
 				if len(inputNumber) == 0 {
 					continue
 				}
 				numbers = append(numbers, inputNumber)
-				numberIndex[inputNumber] = index
-				index++
+				indexes = append(indexes, drawMap[inputNumber])
 			}
 		}
-		boards = append(boards, Board{
-			numbers:     numbers,
-			numberIndex: numberIndex,
-			numberState: make(map[string]bool),
-		})
-
-		rows = rows[5:]
+		boardNumbers = append(boardNumbers, numbers)
+		boards = append(boards, indexes)
+		rows = rows[size:]
 	}
 
-	var first, last int
-	skip := make(map[int]bool)
-	for _, n := range strings.Split(draw, ",") {
-		for i, b := range boards {
-			if !skip[i] && b.Bingo(n) {
-				number, _ := strconv.Atoi(n)
-				last = number * b.UnmarkedSum()
-				skip[i] = true
-				if first == 0 {
-					first = last
-				}
+	indexes := make([]BoardIndex, len(boards))
+	for index, board := range boards {
+		rows := make([]int, 0, size)
+		for i := 0; i < size*size; i += size {
+			row := board[i]
+			for j := i; j < i+size; j++ {
+				row = max(row, board[j])
 			}
+			rows = append(rows, row)
+		}
+
+		columns := make([]int, 0, size)
+		for i := 0; i < size; i++ {
+			column := board[i]
+			for j := i; j < size*size; j += size {
+				column = max(column, board[j])
+			}
+			columns = append(columns, column)
+		}
+
+		winIndex := min(rows[0], columns[0])
+		for i := 0; i < len(rows); i++ {
+			for j := 0; j < len(columns); j++ {
+				newMin := min(rows[i], columns[j])
+				winIndex = min(winIndex, newMin)
+			}
+		}
+		indexes[index] = BoardIndex{
+			Index:    index,
+			WinIndex: winIndex,
 		}
 	}
 
-	println("silver:", first)
-	println("gold:", last)
+	sort.Slice(indexes, func(i, j int) bool {
+		return indexes[i].WinIndex < indexes[j].WinIndex
+	})
+
+	println("silver:", bingo(indexes[0], drawSlice, boardNumbers))
+	println("gold:", bingo(indexes[len(indexes)-1], drawSlice, boardNumbers))
 
 	return nil
 }
 
-type Board struct {
-	numbers     []string
-	numberIndex map[string]int
-	numberState map[string]bool
-}
-
-func (b *Board) Bingo(newNumber string) bool {
-	index, exists := b.numberIndex[newNumber]
-	if !exists {
-		return false
+func bingo(boardIndex BoardIndex, drawSlice []string, boardNumbers [][]string) int {
+	winDrawNumbers := make(map[string]struct{})
+	for _, n := range drawSlice[:boardIndex.WinIndex+1] {
+		winDrawNumbers[n] = struct{}{}
 	}
 
-	b.numberState[newNumber] = true
-	columnBingo := true
-	rowBingo := true
-
-	// Column check
-	for minColumn := index % 5; minColumn < 25; minColumn += 5 {
-		columnBingo = columnBingo && b.numberState[b.numbers[minColumn]]
-	}
-	// Row check
-	for minRow := (index / 5) * 5; minRow < (index/5)*5+5; minRow++ {
-		rowBingo = rowBingo && b.numberState[b.numbers[minRow]]
-	}
-
-	return columnBingo || rowBingo
-}
-
-func (b Board) UnmarkedSum() int {
 	var sum int
-	for number := range b.numberIndex {
-		if !b.numberState[number] {
-			n, _ := strconv.Atoi(number)
-			sum += n
+	for _, n := range boardNumbers[boardIndex.Index] {
+		if _, ok := winDrawNumbers[n]; ok {
+			continue
 		}
+		value, _ := strconv.Atoi(n)
+		sum += value
 	}
-	return sum
+	winDraw, _ := strconv.Atoi(drawSlice[boardIndex.WinIndex])
+	return winDraw * sum
+}
+
+type BoardIndex struct {
+	Index    int
+	WinIndex int
 }
 
 func main() {
