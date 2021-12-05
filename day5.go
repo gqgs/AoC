@@ -107,17 +107,15 @@ func solve() error {
 		}
 	}
 
-	var silver int
+	var result int
 	for x := 0; x < maxX; x++ {
 		for y := 0; y < maxY; y++ {
 			if grid[x][y] >= 2 {
-				silver++
+				result++
 			}
-			//print(grid[x][y], " ")
 		}
-		// println()
 	}
-	println("silver:", silver)
+	println(result)
 
 	return nil
 }
