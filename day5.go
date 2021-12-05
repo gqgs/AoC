@@ -99,10 +99,10 @@ func solve() error {
 				for y := min(miny, maxy); y <= max(miny, maxy); y++ {
 					grid[minx][y]++
 				}
-			} else {
-				for x := minx; x <= maxx; x++ {
-					grid[x][f(x)]++
-				}
+				continue
+			}
+			for x := minx; x <= maxx; x++ {
+				grid[x][f(x)]++
 			}
 		}
 	}
