@@ -34,6 +34,13 @@ func solve() error {
 
 	numbersIndex := [...]int{1, 7, 4, 3, 5, 2, 9, 0, 6, 8}
 
+	decode := func(s string) (number uint) {
+		for _, c := range s {
+			number |= runeMap[c]
+		}
+		return
+	}
+
 	scanner := bufio.NewScanner(file)
 	var sum int
 	for scanner.Scan() {
@@ -44,11 +51,7 @@ func solve() error {
 
 		inputNumbers := make([]uint, 10)
 		for i := range input {
-			var inputNumber uint
-			for _, c := range input[i] {
-				inputNumber |= runeMap[c]
-			}
-			inputNumbers[i] = inputNumber
+			inputNumbers[i] = decode(input[i])
 		}
 
 		sort.Slice(inputNumbers, func(i, j int) bool {
@@ -65,10 +68,7 @@ func solve() error {
 
 		var base int = 1e3
 		for _, o := range output {
-			var outputNumber uint
-			for _, c := range o {
-				outputNumber |= runeMap[c]
-			}
+			outputNumber := decode(o)
 			for i := range inputNumbers {
 				if inputNumbers[i]^outputNumber == 0 {
 					sum += base * numbersIndex[i]
