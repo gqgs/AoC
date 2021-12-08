@@ -1,10 +1,11 @@
 package main
 
 import (
-	"bufio"
+	"encoding/csv"
+	"math"
+	"math/rand"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func abs(x int) int {
@@ -14,48 +15,94 @@ func abs(x int) int {
 	return x
 }
 
-func silver(hPositions map[int]int) int {
-	minCost := 1<<63 - 1
-	for hPosition := range hPositions {
-		var cost int
-		for position, nCrabs := range hPositions {
-			cost += abs(hPosition-position) * nCrabs
-		}
-		if cost < minCost {
-			minCost = cost
-		}
-	}
-	return minCost
+func cost(d int) int {
+	return d * (d + 1) / 2
 }
 
-func gold(hPositions map[int]int) int {
-	minX := 1<<63 - 1
-	maxX := 0
+func gold(list []int, roudFunc func(x float64) float64) int {
+	m := int(roudFunc(mean(list)))
+	var sum int
+	for _, l := range list {
+		sum += cost(abs(m - l))
+	}
+	return sum
+}
 
-	for position := range hPositions {
-		if position < minX {
-			minX = position
+func mean(list []int) float64 {
+	var sum int
+	for _, l := range list {
+		sum += l
+	}
+	return float64(sum) / float64(len(list))
+}
+
+func silver(list []int) int {
+	m := int(median(list))
+	var sum int
+	for _, l := range list {
+		sum += abs(m - l)
+	}
+	return sum
+}
+
+func median(list []int) float64 {
+	mid := len(list) / 2
+
+	if len(list) == 0 {
+		return 0
+	}
+	if len(list)%2 == 0 {
+		return float64(quickSelect(list, mid)+quickSelect(list, mid-1)) / 2
+
+	}
+	return float64(quickSelect(list, mid))
+}
+
+func quickSelect(list []int, n int) int {
+	return selectKth(list, 0, len(list)-1, n)
+}
+
+func selectKth(list []int, left, right, k int) int {
+	for {
+		if left == right {
+			return list[left]
 		}
-		if position > maxX {
-			maxX = position
+		pivotIndex := partition(list, left, right, rand.Intn(right-left+1)+left)
+		if k == pivotIndex {
+			return list[k]
+		}
+		if k < pivotIndex {
+			right = pivotIndex - 1
+		} else {
+			left = pivotIndex + 1
 		}
 	}
+}
 
-	moveCost := func(d int) int {
-		return d * (d + 1) / 2
-	}
-
-	minCost := 1<<63 - 1
-	for x := minX; x <= maxX; x++ {
-		var cost int
-		for position, nCrabs := range hPositions {
-			cost += moveCost(abs(x-position)) * nCrabs
-		}
-		if cost < minCost {
-			minCost = cost
+func partition(list []int, left, right, pivotIndex int) int {
+	pivot := list[pivotIndex]
+	list[pivotIndex], list[right] = list[right], list[pivotIndex]
+	storeIndex := left
+	for i := left; i < right; i++ {
+		if list[i] < pivot {
+			list[storeIndex], list[i] = list[i], list[storeIndex]
+			storeIndex++
 		}
 	}
-	return minCost
+	list[storeIndex], list[right] = list[right], list[storeIndex]
+	return storeIndex
+}
+
+func stringsToInts(strs []string) ([]int, error) {
+	ints := make([]int, len(strs))
+	for i := range strs {
+		var err error
+		ints[i], err = strconv.Atoi(strs[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ints, nil
 }
 
 func solve() error {
@@ -65,17 +112,18 @@ func solve() error {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	scanner.Scan()
-	crabs := strings.Split(scanner.Text(), ",")
-	hPositions := make(map[int]int)
-	for _, c := range crabs {
-		h, _ := strconv.Atoi(c)
-		hPositions[h]++
+	reader := csv.NewReader(file)
+	data, err := reader.Read()
+	if err != nil {
+		return err
+	}
+	crabs, err := stringsToInts(data)
+	if err != nil {
+		return err
 	}
 
-	println("silver:", silver(hPositions))
-	println("gold:", gold(hPositions))
+	println("silver:", silver(crabs))
+	println("gold: [", gold(crabs, math.Floor), gold(crabs, math.Ceil), "]")
 
 	return nil
 }
