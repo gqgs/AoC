@@ -20,6 +20,18 @@ func compare(values []uint64) uint {
 	return increased
 }
 
+func silver(values []uint64) uint {
+	return compare(values)
+}
+
+func gold(values []uint64) uint {
+	var windowed []uint64
+	for i := 0; i < len(values)-2; i++ {
+		windowed = append(windowed, values[i]+values[i+1]+values[i+2])
+	}
+	return compare(windowed)
+}
+
 func solve() error {
 	file, err := os.Open("day1")
 	if err != nil {
@@ -38,23 +50,14 @@ func solve() error {
 		values = append(values, next)
 	}
 
-	println("silver:", compare(values))
-
-	var windowed []uint64
-	for i := 0; i < len(values); i++ {
-		if i+2 < len(values) {
-			windowed = append(windowed, values[i]+values[i+1]+values[i+2])
-		}
-	}
-
-	println("gold:", compare(windowed))
+	println("silver:", silver(values))
+	println("gold:", gold(values))
 
 	return nil
 }
 
 func main() {
-	err := solve()
-	if err != nil {
+	if err := solve(); err != nil {
 		panic(err)
 	}
 }
