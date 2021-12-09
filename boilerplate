@@ -19,7 +19,7 @@ func stringsToInts(strs []string) ([]int, error) {
 }
 
 func solve() error {
-	file, err := os.Open("dayX")
+	file, err := os.Open(os.args[1])
 	if err != nil {
 		return err
 	}
