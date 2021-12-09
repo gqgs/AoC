@@ -67,12 +67,7 @@ func gold(input []string, points [][]int) int {
 		go func(point []int) {
 			defer wg.Done()
 			y, x := point[0], point[1]
-			size := basinSize(input, [][]int{
-				{y, x - 1},
-				{y, x + 1},
-				{y - 1, x},
-				{y + 1, x},
-			})
+			size := basinSize(input, y, x)
 			mu.Lock()
 			if size > basins[0] {
 				heap.Pop(&basins)
@@ -86,14 +81,27 @@ func gold(input []string, points [][]int) int {
 	return basins[0] * basins[1] * basins[2]
 }
 
-func basinSize(input []string, stack [][]int) int {
+type LinkedNode struct {
+	y, x int
+	next *LinkedNode
+}
+
+func basinSize(input []string, y, x int) int {
+	list := &LinkedNode{
+		y, x - 1, &LinkedNode{
+			y, x + 1, &LinkedNode{
+				y - 1, x, &LinkedNode{
+					y + 1, x, nil,
+				},
+			},
+		}}
+
 	var size int
 	visited := make(map[int]map[int]struct{})
-	for len(stack) > 0 {
-		next := stack[0]
-		stack = stack[1:]
+	for list != nil {
+		y, x := list.y, list.x
+		list = list.next
 
-		y, x := next[0], next[1]
 		if input[y][x] == '9' {
 			continue
 		}
@@ -107,14 +115,14 @@ func basinSize(input []string, stack [][]int) int {
 		visited[y][x] = struct{}{}
 
 		size++
-
-		stack = append(stack, [][]int{
-			{y, x - 1},
-			{y, x + 1},
-			{y - 1, x},
-			{y + 1, x},
-		}...)
-
+		list = &LinkedNode{
+			y, x - 1, &LinkedNode{
+				y, x + 1, &LinkedNode{
+					y - 1, x, &LinkedNode{
+						y + 1, x, list,
+					},
+				},
+			}}
 	}
 	return size
 }
