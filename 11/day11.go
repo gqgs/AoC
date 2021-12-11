@@ -4,57 +4,20 @@ import (
 	"bufio"
 	"os"
 	"strconv"
+
+	"github.com/gqgs/AoC2021/generic"
 )
 
 const gridSize = 10
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+var min = generic.Min[int]
+var max = generic.Max[int]
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
+type Stack = generic.Stack[[2]int]
 
-type Stack [][2]int
-
-func (s *Stack) Push(r [2]int) {
-	*s = append(*s, r)
-}
-
-func (s *Stack) Pop() [2]int {
-	r := (*s)[len(*s)-1]
-	*s = (*s)[:len(*s)-1]
-	return r
-}
-
-func solve() error {
-	file, err := os.Open(os.Args[1])
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	var grid [gridSize][gridSize]int
-	var row int
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		var column int
-		for _, c := range scanner.Text() {
-			n, _ := strconv.Atoi(string(c))
-			grid[row][column] = n
-			column++
-		}
-		row++
-	}
-
+func solve() {
 	var totalFlashes int
+	grid := readGrid()
 	stack := make(Stack, 0)
 	for i := 0; ; i++ {
 		for x := 0; x < gridSize; x++ {
@@ -102,13 +65,33 @@ func solve() error {
 		if currentFlahes == gridSize*gridSize {
 			println("silver:", totalFlashes)
 			println("gold:", i+1)
-			return nil
+			return
 		}
 	}
 }
 
-func main() {
-	if err := solve(); err != nil {
+func readGrid() [gridSize][gridSize]int {
+	file, err := os.Open(os.Args[1])
+	if err != nil {
 		panic(err)
 	}
+	defer file.Close()
+
+	var grid [gridSize][gridSize]int
+	var row int
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		var column int
+		for _, c := range scanner.Text() {
+			n, _ := strconv.Atoi(string(c))
+			grid[row][column] = n
+			column++
+		}
+		row++
+	}
+	return grid
+}
+
+func main() {
+	solve()
 }

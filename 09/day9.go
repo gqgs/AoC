@@ -6,36 +6,17 @@ import (
 	"os"
 	"strings"
 	"sync"
-)
 
-func min(a, b byte) byte {
-	if a < b {
-		return a
-	}
-	return b
-}
+	"github.com/gqgs/AoC2021/generic"
+)
 
 func castRune(c byte) int {
 	return int(c - '0')
 }
 
-type IntHeap []int
+var min = generic.Min[byte]
 
-func (h IntHeap) Len() int           { return len(h) }
-func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
-func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-
-func (h *IntHeap) Push(x interface{}) {
-	*h = append(*h, x.(int))
-}
-
-func (h *IntHeap) Pop() interface{} {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-	return x
-}
+type IntHeap = generic.MinHeap[int]
 
 func findMinPoints(input []string) [][]int {
 	var points [][]int
@@ -62,14 +43,15 @@ func gold(input []string, points [][]int) int {
 	mu := new(sync.Mutex)
 	wg := new(sync.WaitGroup)
 	wg.Add(len(points))
-	basins := IntHeap{0, 0, 0}
+	stack := generic.Stack[int]{0, 0, 0}
+	basins := IntHeap{stack}
 	for _, point := range points {
 		go func(point []int) {
 			defer wg.Done()
 			y, x := point[0], point[1]
 			size := basinSize(input, y, x)
 			mu.Lock()
-			if size > basins[0] {
+			if size > basins.Min() {
 				heap.Pop(&basins)
 				heap.Push(&basins, size)
 			}
@@ -78,7 +60,7 @@ func gold(input []string, points [][]int) int {
 	}
 	wg.Wait()
 
-	return basins[0] * basins[1] * basins[2]
+	return stack[0] * stack[1] * stack[2]
 }
 
 type LinkedNode struct {

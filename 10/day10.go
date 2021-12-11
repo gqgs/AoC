@@ -3,7 +3,8 @@ package main
 import (
 	"bufio"
 	"os"
-	"sort"
+
+	"github.com/gqgs/AoC2021/generic"
 )
 
 var (
@@ -29,17 +30,7 @@ var (
 	}
 )
 
-type Stack []rune
-
-func (s *Stack) Push(r rune) {
-	*s = append(*s, r)
-}
-
-func (s *Stack) Pop() rune {
-	r := (*s)[len(*s)-1]
-	*s = (*s)[:len(*s)-1]
-	return r
-}
+type Stack = generic.Stack[rune]
 
 func silver(input []string) ([]Stack, int) {
 	var sum int
@@ -77,8 +68,7 @@ func gold(invalidStack []Stack) int {
 		sums = append(sums, sum)
 	}
 
-	sort.Ints(sums)
-	return sums[len(sums)/2]
+	return generic.QuickSelect(sums, len(sums)/2)
 }
 
 func solve() error {

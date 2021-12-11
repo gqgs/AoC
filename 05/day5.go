@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/gqgs/AoC2021/generic"
 )
 
 type Point struct {
@@ -14,19 +16,8 @@ type Line struct {
 	P1, P2 Point
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+var max = generic.Max[int]
+var min = generic.Min[int]
 
 func abs(x int) int {
 	if x < 0 {

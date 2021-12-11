@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/csv"
 	"math"
-	"math/rand"
 	"os"
 	"strconv"
+
+	"github.com/gqgs/AoC2021/generic"
 )
 
 func abs(x int) int {
@@ -52,45 +53,10 @@ func median(list []int) float64 {
 		return 0
 	}
 	if len(list)%2 == 0 {
-		return float64(quickSelect(list, mid)+quickSelect(list, mid-1)) / 2
+		return float64(generic.QuickSelect(list, mid)+generic.QuickSelect(list, mid-1)) / 2
 
 	}
-	return float64(quickSelect(list, mid))
-}
-
-func quickSelect(list []int, n int) int {
-	return selectKth(list, 0, len(list)-1, n)
-}
-
-func selectKth(list []int, left, right, k int) int {
-	for {
-		if left == right {
-			return list[left]
-		}
-		pivotIndex := partition(list, left, right, rand.Intn(right-left+1)+left)
-		if k == pivotIndex {
-			return list[k]
-		}
-		if k < pivotIndex {
-			right = pivotIndex - 1
-		} else {
-			left = pivotIndex + 1
-		}
-	}
-}
-
-func partition(list []int, left, right, pivotIndex int) int {
-	pivot := list[pivotIndex]
-	list[pivotIndex], list[right] = list[right], list[pivotIndex]
-	storeIndex := left
-	for i := left; i < right; i++ {
-		if list[i] < pivot {
-			list[storeIndex], list[i] = list[i], list[storeIndex]
-			storeIndex++
-		}
-	}
-	list[storeIndex], list[right] = list[right], list[storeIndex]
-	return storeIndex
+	return float64(generic.QuickSelect(list, mid))
 }
 
 func stringsToInts(strs []string) ([]int, error) {
