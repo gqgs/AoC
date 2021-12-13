@@ -2,6 +2,7 @@ package generic
 
 import (
 	"constraints"
+	heaplib "container/heap"
 	"math/rand"
 )
 
@@ -32,14 +33,38 @@ func (s *Stack[T]) Pop() T {
 	return r
 }
 
-type MinHeap[T constraints.Ordered] struct{ Heap Stack[T] }
+type heap[T constraints.Ordered] struct {
+	stack    Stack[T]
+	lessFunc func(x, y T) bool
+}
 
-func (h MinHeap[T]) Len() int            { return len(h.Heap) }
-func (h MinHeap[T]) Less(i, j int) bool  { return h.Heap[i] < h.Heap[j] }
-func (h MinHeap[T]) Swap(i, j int)       { h.Heap[i], h.Heap[j] = h.Heap[j], h.Heap[i] }
-func (h MinHeap[T]) Min() T              { return h.Heap[0] }
-func (h *MinHeap[T]) Push(x interface{}) { h.Heap.Push(x.(T)) }
-func (h *MinHeap[T]) Pop() interface{}   { return h.Heap.Pop() }
+func (h heap[T]) Len() int            { return len(h.stack) }
+func (h heap[T]) Less(i, j int) bool  { return h.lessFunc(h.stack[i], h.stack[j]) }
+func (h heap[T]) Swap(i, j int)       { h.stack[i], h.stack[j] = h.stack[j], h.stack[i] }
+func (h heap[T]) Min() T              { return h.stack[0] }
+func (h *heap[T]) Push(x interface{}) { h.stack.Push(x.(T)) }
+func (h *heap[T]) Pop() interface{}   { return h.stack.Pop() }
+
+func NewMinHeap[T constraints.Ordered]() minHeap[T] {
+	return minHeap[T]{
+		heap[T]{
+			make(Stack[T], 0),
+			func(x, y T) bool {
+				return x < y
+			},
+		},
+	}
+}
+
+type minHeap[T constraints.Ordered] struct{ heap heap[T] }
+
+func (h minHeap[T]) Min() T  { return h.heap.Min() }
+func (h *minHeap[T]) Pop() T { return heaplib.Pop(&h.heap).(T) }
+func (h *minHeap[T]) Push(l ...T) {
+	for _, e := range l {
+		heaplib.Push(&h.heap, e)
+	}
+}
 
 func QuickSelect[T constraints.Ordered](list []T, k int) T {
 	return selectKth(list, 0, len(list)-1, k)

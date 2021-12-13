@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"container/heap"
 	"os"
 	"strings"
 	"sync"
@@ -15,8 +14,6 @@ func castRune(c byte) int {
 }
 
 var min = generic.Min[byte]
-
-type IntHeap = generic.MinHeap[int]
 
 func findMinPoints(input []string) [][]int {
 	var points [][]int
@@ -43,8 +40,9 @@ func gold(input []string, points [][]int) int {
 	mu := new(sync.Mutex)
 	wg := new(sync.WaitGroup)
 	wg.Add(len(points))
-	stack := generic.Stack[int]{0, 0, 0}
-	basins := IntHeap{stack}
+	basins := generic.NewMinHeap[int]()
+	basins.Push(0, 0, 0)
+
 	for _, point := range points {
 		go func(point []int) {
 			defer wg.Done()
@@ -52,15 +50,15 @@ func gold(input []string, points [][]int) int {
 			size := basinSize(input, y, x)
 			mu.Lock()
 			if size > basins.Min() {
-				heap.Pop(&basins)
-				heap.Push(&basins, size)
+				basins.Pop()
+				basins.Push(size)
 			}
 			mu.Unlock()
 		}(point)
 	}
 	wg.Wait()
 
-	return stack[0] * stack[1] * stack[2]
+	return basins.Pop() * basins.Pop() * basins.Pop()
 }
 
 type LinkedNode struct {
