@@ -31,8 +31,10 @@ func solve() error {
 		graph[node2][node1] = struct{}{}
 	}
 
+	cache := make(map[string]int)
+
 	println("silver:", silver("start", []string{"start"}, graph))
-	println("gold:", gold("start", []string{"start"}, false, graph))
+	println("gold:", gold("start", []string{"start"}, false, graph, cache))
 
 	return nil
 }
@@ -70,7 +72,24 @@ func silver(node string, path []string, graph map[string]map[string]struct{}) in
 	return paths
 }
 
-func gold(node string, path []string, alreadyDoubleVisited bool, graph map[string]map[string]struct{}) int {
+func key(node string, list []string) string {
+	filteres := make([]string, 0, len(list))
+	for _, e := range list {
+		if unicode.IsUpper(rune(e[0])) {
+			continue
+		}
+		filteres = append(filteres, e)
+	}
+	filteres = append(filteres, node)
+	return strings.Join(filteres, ",")
+}
+
+func gold(node string, path []string, alreadyDoubleVisited bool, graph map[string]map[string]struct{}, cache map[string]int) int {
+	cacheKey := key(node, path)
+	if _, cacheHit := cache[cacheKey]; cacheHit {
+		return cache[cacheKey]
+	}
+
 	if node == "end" {
 		return 1
 	}
@@ -88,14 +107,15 @@ func gold(node string, path []string, alreadyDoubleVisited bool, graph map[strin
 				if alreadyDoubleVisited {
 					continue
 				}
-				paths += gold(adjacent, append(path, adjacent), true, graph)
+				paths += gold(adjacent, append(path, adjacent), true, graph, cache)
 				continue
 			default:
 				continue
 			}
 		}
-		paths += gold(adjacent, append(path, adjacent), alreadyDoubleVisited, graph)
+		paths += gold(adjacent, append(path, adjacent), alreadyDoubleVisited, graph, cache)
 	}
+	cache[cacheKey] = paths
 	return paths
 }
 
