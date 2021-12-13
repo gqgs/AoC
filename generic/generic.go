@@ -45,10 +45,10 @@ func (h heap[T]) Min() T              { return h.stack[0] }
 func (h *heap[T]) Push(x interface{}) { h.stack.Push(x.(T)) }
 func (h *heap[T]) Pop() interface{}   { return h.stack.Pop() }
 
-func NewMinHeap[T constraints.Ordered]() minHeap[T] {
+func NewMinHeap[T constraints.Ordered](capacity int) minHeap[T] {
 	return minHeap[T]{
 		heap[T]{
-			make(Stack[T], 0),
+			make(Stack[T], 0, capacity),
 			func(x, y T) bool {
 				return x < y
 			},

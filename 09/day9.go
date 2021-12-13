@@ -40,7 +40,7 @@ func gold(input []string, points [][]int) int {
 	mu := new(sync.Mutex)
 	wg := new(sync.WaitGroup)
 	wg.Add(len(points))
-	basins := generic.NewMinHeap[int]()
+	basins := generic.NewMinHeap[int](3)
 	basins.Push(0, 0, 0)
 
 	for _, point := range points {
