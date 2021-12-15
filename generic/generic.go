@@ -33,7 +33,7 @@ func (s *Stack[T]) Pop() T {
 	return r
 }
 
-type heap[T constraints.Ordered] struct {
+type heap[T any] struct {
 	stack    Stack[T]
 	lessFunc func(x, y T) bool
 }
@@ -45,21 +45,20 @@ func (h heap[T]) Min() T              { return h.stack[0] }
 func (h *heap[T]) Push(x interface{}) { h.stack.Push(x.(T)) }
 func (h *heap[T]) Pop() interface{}   { return h.stack.Pop() }
 
-func NewMinHeap[T constraints.Ordered](capacity int) minHeap[T] {
+func NewMinHeap[T any](lessFunc func(e1, e2 T) bool) minHeap[T] {
 	return minHeap[T]{
 		heap[T]{
-			make(Stack[T], 0, capacity),
-			func(x, y T) bool {
-				return x < y
-			},
+			make(Stack[T], 0),
+			lessFunc,
 		},
 	}
 }
 
-type minHeap[T constraints.Ordered] struct{ heap heap[T] }
+type minHeap[T any] struct{ heap heap[T] }
 
-func (h minHeap[T]) Min() T  { return h.heap.Min() }
-func (h *minHeap[T]) Pop() T { return heaplib.Pop(&h.heap).(T) }
+func (h minHeap[T]) Len() int { return h.heap.Len() }
+func (h minHeap[T]) Min() T   { return h.heap.Min() }
+func (h *minHeap[T]) Pop() T  { return heaplib.Pop(&h.heap).(T) }
 func (h *minHeap[T]) Push(l ...T) {
 	for _, e := range l {
 		heaplib.Push(&h.heap, e)
