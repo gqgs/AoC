@@ -6,18 +6,24 @@ import (
 	"math/rand"
 )
 
-func Min[T constraints.Ordered](a, b T) T {
-	if a < b {
-		return a
+func Min[T constraints.Ordered](l ...T) (min T) {
+	min = l[0]
+	for _, e := range l[1:] {
+		if e < min {
+			min = e
+		}
 	}
-	return b
+	return
 }
 
-func Max[T constraints.Ordered](a, b T) T {
-	if a > b {
-		return a
+func Max[T constraints.Ordered](l ...T) (max T) {
+	max = l[0]
+	for _, e := range l[1:] {
+		if e > max {
+			max = e
+		}
 	}
-	return b
+	return
 }
 
 type Stack[T any] []T
