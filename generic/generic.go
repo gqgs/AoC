@@ -26,6 +26,13 @@ func Max[T constraints.Ordered](l ...T) (max T) {
 	return
 }
 
+func Abs(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
+
 type Stack[T any] []T
 
 func (s *Stack[T]) Push(r T) {
