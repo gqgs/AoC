@@ -33,6 +33,18 @@ func Abs(a int) int {
 	return a
 }
 
+type Queue[T any] []T
+
+func (s *Queue[T]) Push(r T) {
+	*s = append(*s, r)
+}
+
+func (s *Queue[T]) Pop() T {
+	r := (*s)[0]
+	(*s) = (*s)[1:]
+	return r
+}
+
 type Stack[T any] []T
 
 func (s *Stack[T]) Push(r T) {
