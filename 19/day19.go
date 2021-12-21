@@ -16,63 +16,37 @@ type Scanner struct {
 }
 
 func transform(x, y, z, r int) [3]int {
-	switch r {
-	case 0:
-		return [3]int{x, y, z}
-	case 1:
-		return [3]int{x, -y, -z}
-	case 2:
-		return [3]int{x, z, -y}
-	case 3:
-		return [3]int{x, -z, y}
+	return [24][3]int{
+		{x, y, z},
+		{x, -y, -z},
+		{x, z, -y},
+		{x, -z, y},
 
-	case 4:
-		return [3]int{y, x, -z}
-	case 5:
-		return [3]int{y, -x, z}
-	case 6:
-		return [3]int{y, z, x}
-	case 7:
-		return [3]int{y, -z, -x}
+		{y, x, -z},
+		{y, -x, z},
+		{y, z, x},
+		{y, -z, -x},
 
-	case 8:
-		return [3]int{z, x, y}
-	case 9:
-		return [3]int{z, -x, -y}
-	case 10:
-		return [3]int{z, y, -x}
-	case 11:
-		return [3]int{z, -y, x}
+		{z, x, y},
+		{z, -x, -y},
+		{z, y, -x},
+		{z, -y, x},
 
-	case 12:
-		return [3]int{-x, y, -z}
-	case 13:
-		return [3]int{-x, -y, z}
-	case 14:
-		return [3]int{-x, z, y}
-	case 15:
-		return [3]int{-x, -z, -y}
+		{-x, y, -z},
+		{-x, -y, z},
+		{-x, z, y},
+		{-x, -z, -y},
 
-	case 16:
-		return [3]int{-y, x, z}
-	case 17:
-		return [3]int{-y, -x, -z}
-	case 18:
-		return [3]int{-y, z, -x}
-	case 19:
-		return [3]int{-y, -z, x}
+		{-y, x, z},
+		{-y, -x, -z},
+		{-y, z, -x},
+		{-y, -z, x},
 
-	case 20:
-		return [3]int{-z, x, -y}
-	case 21:
-		return [3]int{-z, -x, y}
-	case 22:
-		return [3]int{-z, y, x}
-	case 23:
-		return [3]int{-z, -y, -x}
-	}
-
-	panic("")
+		{-z, x, -y},
+		{-z, -x, y},
+		{-z, y, x},
+		{-z, -y, -x},
+	}[r]
 }
 
 func transforms(x, y, z int) [24][3]int {
@@ -80,53 +54,34 @@ func transforms(x, y, z int) [24][3]int {
 	for r := 0; r < 24; r++ {
 		rotations[r] = transform(x, y, z, r)
 	}
-	// rotations[0] = [3]int{x, y, z}
-	// rotations[1] = [3]int{x, -y, -z}
-	// rotations[2] = [3]int{x, z, -y}
-	// rotations[3] = [3]int{x, -z, y}
-
-	// rotations[4] = [3]int{y, x, -z}
-	// rotations[5] = [3]int{y, -x, z}
-	// rotations[6] = [3]int{y, z, x}
-	// rotations[7] = [3]int{y, -z, -x}
-
-	// rotations[8] = [3]int{z, x, y}
-	// rotations[9] = [3]int{z, -x, -y}
-	// rotations[10] = [3]int{z, y, -x}
-	// rotations[11] = [3]int{z, -y, x}
-
-	// rotations[12] = [3]int{-x, y, -z}
-	// rotations[13] = [3]int{-x, -y, z}
-	// rotations[14] = [3]int{-x, z, y}
-	// rotations[15] = [3]int{-x, -z, -y}
-
-	// rotations[16] = [3]int{-y, x, z}
-	// rotations[17] = [3]int{-y, -x, -z}
-	// rotations[18] = [3]int{-y, z, -x}
-	// rotations[19] = [3]int{-y, -z, x}
-
-	// rotations[20] = [3]int{-z, x, -y}
-	// rotations[21] = [3]int{-z, -x, y}
-	// rotations[22] = [3]int{-z, y, x}
-	// rotations[23] = [3]int{-z, -y, -x}
-
 	return rotations
 }
 
+func hash(x, y, z int) uint {
+	// FNV-1 hash
+	var prime uint = 1099511628211
+	var hash uint = 14695981039346656037
+	for _, n := range []int{x, y, z} {
+		hash *= prime
+		hash ^= uint(n)
+	}
+	return hash
+}
+
 func overlap(s0, s1 [][3]int) ([][3]int, [3]int) {
-	overlaps := make(map[string]int)
+	overlaps := make(map[uint]int)
 	for _, p1 := range s1 {
 		for index, t1 := range transforms(p1[0], p1[1], p1[2]) {
 			for _, p0 := range s0 {
 				x1, y1, z1 := t1[0], t1[1], t1[2]
 				x2, y2, z2 := p0[0], p0[1], p0[2]
 				x, y, z := x2-x1, y2-y1, z2-z1
-				key := fmt.Sprint(x, y, z)
+				key := hash(x, y, z)
 				overlaps[key]++
 				if overlaps[key] == 12 {
 					var normalizedPoints [][3]int
 					for _, p := range s1 {
-						t := transforms(p[0], p[1], p[2])[index]
+						t := transform(p[0], p[1], p[2], index)
 						normalizedPoints = append(normalizedPoints, [3]int{t[0] + x, t[1] + y, t[2] + z})
 					}
 					return normalizedPoints, [3]int{x, y, z}
@@ -180,9 +135,9 @@ Next:
 	for len(queue) > 0 {
 		next := queue.Pop()
 		for _, s := range transformed {
-			result, scanner := overlap(s, next)
-			if len(result) > 0 {
-				transformed = append(transformed, result)
+			normalized, scanner := overlap(s, next)
+			if len(normalized) > 0 {
+				transformed = append(transformed, normalized)
 				scanners = append(scanners, scanner)
 				continue Next
 			}
@@ -197,7 +152,7 @@ Next:
 		}
 	}
 
-	println("points:", len(points))
+	println("silver:", len(points))
 
 	var maxDistance int
 	for i := 0; i < len(scanners); i++ {
@@ -205,16 +160,16 @@ Next:
 			if i == j {
 				continue
 			}
-			maxDistance = generic.Max(maxDistance, distance(scanners[i], scanners[j]))
+			maxDistance = generic.Max(maxDistance, manhattanDistance(scanners[i], scanners[j]))
 		}
 	}
 
-	println("maxDistance:", maxDistance, len(scanners))
+	println("gold:", maxDistance)
 
 	return nil
 }
 
-func distance(p0, p1 [3]int) int {
+func manhattanDistance(p0, p1 [3]int) int {
 	return generic.Abs(p0[0]-p1[0]) + generic.Abs(p0[1]-p1[1]) + generic.Abs(p0[2]-p1[2])
 
 }
