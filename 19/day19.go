@@ -15,37 +15,100 @@ type Scanner struct {
 	Points [][3]int
 }
 
+func transform(x, y, z, r int) [3]int {
+	switch r {
+	case 0:
+		return [3]int{x, y, z}
+	case 1:
+		return [3]int{x, -y, -z}
+	case 2:
+		return [3]int{x, z, -y}
+	case 3:
+		return [3]int{x, -z, y}
+
+	case 4:
+		return [3]int{y, x, -z}
+	case 5:
+		return [3]int{y, -x, z}
+	case 6:
+		return [3]int{y, z, x}
+	case 7:
+		return [3]int{y, -z, -x}
+
+	case 8:
+		return [3]int{z, x, y}
+	case 9:
+		return [3]int{z, -x, -y}
+	case 10:
+		return [3]int{z, y, -x}
+	case 11:
+		return [3]int{z, -y, x}
+
+	case 12:
+		return [3]int{-x, y, -z}
+	case 13:
+		return [3]int{-x, -y, z}
+	case 14:
+		return [3]int{-x, z, y}
+	case 15:
+		return [3]int{-x, -z, -y}
+
+	case 16:
+		return [3]int{-y, x, z}
+	case 17:
+		return [3]int{-y, -x, -z}
+	case 18:
+		return [3]int{-y, z, -x}
+	case 19:
+		return [3]int{-y, -z, x}
+
+	case 20:
+		return [3]int{-z, x, -y}
+	case 21:
+		return [3]int{-z, -x, y}
+	case 22:
+		return [3]int{-z, y, x}
+	case 23:
+		return [3]int{-z, -y, -x}
+	}
+
+	panic("")
+}
+
 func transforms(x, y, z int) [24][3]int {
 	var rotations [24][3]int
-	rotations[0] = [3]int{x, y, z}
-	rotations[1] = [3]int{x, -y, -z}
-	rotations[2] = [3]int{x, z, -y}
-	rotations[3] = [3]int{x, -z, y}
+	for r := 0; r < 24; r++ {
+		rotations[r] = transform(x, y, z, r)
+	}
+	// rotations[0] = [3]int{x, y, z}
+	// rotations[1] = [3]int{x, -y, -z}
+	// rotations[2] = [3]int{x, z, -y}
+	// rotations[3] = [3]int{x, -z, y}
 
-	rotations[4] = [3]int{y, x, -z}
-	rotations[5] = [3]int{y, -x, z}
-	rotations[6] = [3]int{y, z, x}
-	rotations[7] = [3]int{y, -z, -x}
+	// rotations[4] = [3]int{y, x, -z}
+	// rotations[5] = [3]int{y, -x, z}
+	// rotations[6] = [3]int{y, z, x}
+	// rotations[7] = [3]int{y, -z, -x}
 
-	rotations[8] = [3]int{z, x, y}
-	rotations[9] = [3]int{z, -x, -y}
-	rotations[10] = [3]int{z, y, -x}
-	rotations[11] = [3]int{z, -y, x}
+	// rotations[8] = [3]int{z, x, y}
+	// rotations[9] = [3]int{z, -x, -y}
+	// rotations[10] = [3]int{z, y, -x}
+	// rotations[11] = [3]int{z, -y, x}
 
-	rotations[12] = [3]int{-x, y, -z}
-	rotations[13] = [3]int{-x, -y, z}
-	rotations[14] = [3]int{-x, z, y}
-	rotations[15] = [3]int{-x, -z, -y}
+	// rotations[12] = [3]int{-x, y, -z}
+	// rotations[13] = [3]int{-x, -y, z}
+	// rotations[14] = [3]int{-x, z, y}
+	// rotations[15] = [3]int{-x, -z, -y}
 
-	rotations[16] = [3]int{-y, x, z}
-	rotations[17] = [3]int{-y, -x, -z}
-	rotations[18] = [3]int{-y, z, -x}
-	rotations[19] = [3]int{-y, -z, x}
+	// rotations[16] = [3]int{-y, x, z}
+	// rotations[17] = [3]int{-y, -x, -z}
+	// rotations[18] = [3]int{-y, z, -x}
+	// rotations[19] = [3]int{-y, -z, x}
 
-	rotations[20] = [3]int{-z, x, -y}
-	rotations[21] = [3]int{-z, -x, y}
-	rotations[22] = [3]int{-z, y, x}
-	rotations[23] = [3]int{-z, -y, -x}
+	// rotations[20] = [3]int{-z, x, -y}
+	// rotations[21] = [3]int{-z, -x, y}
+	// rotations[22] = [3]int{-z, y, x}
+	// rotations[23] = [3]int{-z, -y, -x}
 
 	return rotations
 }
