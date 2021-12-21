@@ -3,20 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
 )
-
-func stringsToInts(strs []string) ([]int, error) {
-	ints := make([]int, len(strs))
-	for i := range strs {
-		var err error
-		ints[i], err = strconv.Atoi(strs[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return ints, nil
-}
 
 func solve() error {
 	file, err := os.Open(os.Args[1])
@@ -25,8 +12,8 @@ func solve() error {
 	}
 	defer file.Close()
 
-	// silver(4, 8)
-	gold(4, 8)
+	silver(4, 8)
+	gold(6, 10)
 
 	return nil
 }
@@ -54,53 +41,63 @@ func diracDice() [][3]int {
 	return rolls
 }
 
+var cache map[string][2]int
+
 func split(player, player1Score, player1Position, player2Score, player2Position int) (int, int) {
+	cacheKey := fmt.Sprint(player, player1Score, player1Position, player2Score, player2Position)
+	if value, cached := cache[cacheKey]; cached {
+		return value[0], value[1]
+	}
+
 	var player1Wins, player2Wins int
 	if player%2 == 0 {
 		for _, d := range diracDice() {
 			move := d[0] + d[1] + d[2]
-			player1Position = player1Position + move
-			if player1Position > 10 {
-				player1Position %= 10
-				if player1Position == 0 {
-					player1Position = 10
+			local1Position := player1Position + move
+			if local1Position > 10 {
+				local1Position %= 10
+				if local1Position == 0 {
+					local1Position = 10
 				}
 			}
-			player1Score += player1Position
-			if player1Score >= 21 {
+			local1Score := player1Score
+			local1Score += local1Position
+			if local1Score >= 21 {
 				player1Wins++
 				continue
 			}
-			p1Wins, p2Wins := split(player+1, player1Score, player1Position, player2Score, player2Position)
-			fmt.Println("p1,p2", p1Wins, p2Wins)
+			p1Wins, p2Wins := split(player+1, local1Score, local1Position, player2Score, player2Position)
 			player1Wins += p1Wins
 			player2Wins += p2Wins
 		}
 	} else {
 		for _, d := range diracDice() {
 			move := d[0] + d[1] + d[2]
-			player2Position = player2Position + move
-			if player2Position > 10 {
-				player2Position %= 10
-				if player2Position == 0 {
-					player2Position = 10
+			local2Position := player2Position + move
+			if local2Position > 10 {
+				local2Position %= 10
+				if local2Position == 0 {
+					local2Position = 10
 				}
 			}
-			player2Score += player2Position
-			if player2Score >= 21 {
+			local2Score := player2Score
+			local2Score += local2Position
+			if local2Score >= 21 {
 				player2Wins++
 				continue
 			}
-			p1Wins, p2Wins := split(player+1, player1Score, player1Position, player2Score, player2Position)
+			p1Wins, p2Wins := split(player+1, player1Score, player1Position, local2Score, local2Position)
 			player1Wins += p1Wins
 			player2Wins += p2Wins
 		}
-
 	}
+
+	cache[cacheKey] = [2]int{player1Wins, player2Wins}
 	return player1Wins, player2Wins
 }
 
 func gold(startPlayer1, startPlayer2 int) {
+	cache = make(map[string][2]int)
 	player := 0
 	p1wins, p2wins := split(player, 0, startPlayer1, 0, startPlayer2)
 	fmt.Println("p1wins, p2wins", p1wins, p2wins)
