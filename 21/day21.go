@@ -22,7 +22,6 @@ func genDice(start int) func() int {
 	var i, c int
 	i = start
 	return func() int {
-		println("dice roll", i)
 		c++
 		i++
 		return i - 1
@@ -41,9 +40,7 @@ func diracDice() [][3]int {
 	return rolls
 }
 
-var cache map[string][2]int
-
-func split(player, player1Score, player1Position, player2Score, player2Position int) (int, int) {
+func split(player, player1Score, player1Position, player2Score, player2Position int, cache map[string][2]int) (int, int) {
 	cacheKey := fmt.Sprint(player, player1Score, player1Position, player2Score, player2Position)
 	if value, cached := cache[cacheKey]; cached {
 		return value[0], value[1]
@@ -66,7 +63,7 @@ func split(player, player1Score, player1Position, player2Score, player2Position 
 				player1Wins++
 				continue
 			}
-			p1Wins, p2Wins := split(player+1, local1Score, local1Position, player2Score, player2Position)
+			p1Wins, p2Wins := split(player+1, local1Score, local1Position, player2Score, player2Position, cache)
 			player1Wins += p1Wins
 			player2Wins += p2Wins
 		}
@@ -86,7 +83,7 @@ func split(player, player1Score, player1Position, player2Score, player2Position 
 				player2Wins++
 				continue
 			}
-			p1Wins, p2Wins := split(player+1, player1Score, player1Position, local2Score, local2Position)
+			p1Wins, p2Wins := split(player+1, player1Score, player1Position, local2Score, local2Position, cache)
 			player1Wins += p1Wins
 			player2Wins += p2Wins
 		}
@@ -97,10 +94,10 @@ func split(player, player1Score, player1Position, player2Score, player2Position 
 }
 
 func gold(startPlayer1, startPlayer2 int) {
-	cache = make(map[string][2]int)
 	player := 0
-	p1wins, p2wins := split(player, 0, startPlayer1, 0, startPlayer2)
-	fmt.Println("p1wins, p2wins", p1wins, p2wins)
+	cache := make(map[string][2]int)
+	p1wins, p2wins := split(player, 0, startPlayer1, 0, startPlayer2, cache)
+	fmt.Printf("p1 wins: %d, p2 wins: %d\n", p1wins, p2wins)
 }
 
 func silver(startPlayer1, startPlayer2 int) {
@@ -121,7 +118,7 @@ func silver(startPlayer1, startPlayer2 int) {
 			}
 			player1Score += player1Position
 			if player1Score >= 1000 {
-				fmt.Println("p1 won", player1Score, player2Score)
+				fmt.Println("p1 won", player1Score, player2Score, dice()-1)
 				return
 			}
 		} else {
@@ -135,7 +132,7 @@ func silver(startPlayer1, startPlayer2 int) {
 			}
 			player2Score += player2Position
 			if player2Score >= 1000 {
-				fmt.Println("p2 won", player1Score, player2Score)
+				fmt.Println("p2 won", player1Score, player2Score, dice()-1)
 				return
 			}
 		}
