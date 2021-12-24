@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"os"
 	"sort"
 
@@ -17,14 +18,45 @@ func solve() error {
 
 	// TODO: properly parse this from input file
 	board := new(Board)
+	// board.addAmphipods(Bronze, 2, 1)
+	// board.addAmphipods(Desert, 2, 2)
+	// board.addAmphipods(Desert, 2, 3)
+	// board.addAmphipods(Amber, 2, 4)
+
+	// board.addAmphipods(Copper, 4, 1)
+	// board.addAmphipods(Copper, 4, 2)
+	// board.addAmphipods(Bronze, 4, 3)
+	// board.addAmphipods(Desert, 4, 4)
+
+	// board.addAmphipods(Bronze, 6, 1)
+	// board.addAmphipods(Bronze, 6, 2)
+	// board.addAmphipods(Amber, 6, 3)
+	// board.addAmphipods(Copper, 6, 4)
+
+	// board.addAmphipods(Desert, 8, 1)
+	// board.addAmphipods(Amber, 8, 2)
+	// board.addAmphipods(Copper, 8, 3)
+	// board.addAmphipods(Amber, 8, 4)
+
 	board.addAmphipods(Desert, 2, 1)
 	board.addAmphipods(Desert, 2, 2)
+	board.addAmphipods(Desert, 2, 3)
+	board.addAmphipods(Desert, 2, 4)
+
 	board.addAmphipods(Amber, 4, 1)
-	board.addAmphipods(Amber, 4, 2)
+	board.addAmphipods(Copper, 4, 2)
+	board.addAmphipods(Bronze, 4, 3)
+	board.addAmphipods(Amber, 4, 4)
+
 	board.addAmphipods(Copper, 6, 1)
 	board.addAmphipods(Bronze, 6, 2)
+	board.addAmphipods(Amber, 6, 3)
+	board.addAmphipods(Bronze, 6, 4)
+
 	board.addAmphipods(Copper, 8, 1)
-	board.addAmphipods(Bronze, 8, 2)
+	board.addAmphipods(Amber, 8, 2)
+	board.addAmphipods(Copper, 8, 3)
+	board.addAmphipods(Bronze, 8, 4)
 
 	println(silver(*board, 0))
 
@@ -32,7 +64,7 @@ func solve() error {
 }
 
 type Board struct {
-	state [11][3]*Amphipods
+	state [11][5]*Amphipods
 }
 
 const (
@@ -80,7 +112,7 @@ func (b *Board) addAmphipods(atype, x, y int) {
 
 func (b Board) isFinal() bool {
 	for _, x := range []int{2, 4, 6, 8} {
-		for _, y := range []int{1, 2} {
+		for _, y := range []int{1, 2, 3, 4} {
 			if b.state[x][y] == nil || !b.state[x][y].isFinalRoom(x, y) {
 				return false
 			}
@@ -91,7 +123,7 @@ func (b Board) isFinal() bool {
 
 func (b Board) String() string {
 	var str string
-	for y := 0; y < 3; y++ {
+	for y := 0; y < 5; y++ {
 		for x := 0; x < 11; x++ {
 			if b.state[x][y] == nil {
 				if y == 0 || x == 2 || x == 4 || x == 6 || x == 8 {
@@ -126,10 +158,23 @@ func typeString(t int) string {
 func (b Board) validMoves() [][2][3]int {
 	var moves [][2][3]int
 	var isBlockinDoor bool
+<<<<<<< HEAD
 
+=======
+>>>>>>> 299dcab (Day 24)
 	// at the front of room door
 	for _, x := range []int{2, 4, 6, 8} {
 		if b.state[x][0] != nil {
+			isBlockinDoor = true
+			for i := x + 1; i < 11 && b.state[i][0] == nil; i++ {
+				if i != 2 && i != 4 && i != 6 && i != 8 {
+					moves = append(moves, [2][3]int{
+						{x, 0, b.state[x][0].moveCost(i - x)},
+						{i, 0, 0},
+					})
+				}
+			}
+
 			for i := x - 1; i >= 0 && b.state[i][0] == nil; i-- {
 				if i != 2 && i != 4 && i != 6 && i != 8 {
 					moves = append(moves, [2][3]int{
@@ -138,50 +183,34 @@ func (b Board) validMoves() [][2][3]int {
 					})
 				}
 			}
-			for i := x + 1; i < 11 && b.state[i][0] == nil; i-- {
-				if i != 2 && i != 4 && i != 6 && i != 8 {
-					moves = append(moves, [2][3]int{
-						{x, 0, b.state[x][0].moveCost(i - x)},
-						{i, 0, 0},
-					})
-				}
-			}
 		}
 	}
 
-	if len(moves) > 0 {
+	if isBlockinDoor {
 		return moves
 	}
 
-	// at the end of room
-	for _, x := range []int{2, 4, 6, 8} {
-		if b.state[x][2] != nil {
-			if b.state[x][2].isFinalRoom(x, 2) {
-				continue
-			}
-			moves = append(moves, [2][3]int{
-				{x, 2, b.state[x][2].moveCost(1)},
-				{x, 1, 0},
-			})
+	needsToMove := func(x, y int) bool {
+		if b.state[x][y] == nil {
+			return false
 		}
+		for dy := y; dy <= 4; dy++ {
+			if b.state[x][dy] != nil && !b.state[x][dy].isFinalRoom(x, dy) {
+				return true
+			}
+		}
+		return !b.state[x][y].isFinalRoom(x, y)
 	}
 
 	// inside the room
 	for _, x := range []int{2, 4, 6, 8} {
-		if b.state[x][2] != nil && !b.state[x][2].isFinalRoom(x, 2) {
-			if b.state[x][1] != nil {
+		for _, y := range []int{4, 3, 2, 1} {
+			if needsToMove(x, y) {
 				moves = append(moves, [2][3]int{
-					{x, 1, b.state[x][1].moveCost(1)},
-					{x, 0, 0},
+					{x, y, b.state[x][y].moveCost(1)},
+					{x, y - 1, 0},
 				})
-				continue
 			}
-		}
-		if b.state[x][1] != nil && !b.state[x][1].isFinalRoom(x, 1) {
-			moves = append(moves, [2][3]int{
-				{x, 1, b.state[x][1].moveCost(1)},
-				{x, 0, 0},
-			})
 		}
 	}
 
@@ -190,17 +219,15 @@ func (b Board) validMoves() [][2][3]int {
 		if b.state[x][0] != nil {
 			if b.pathExists(next(x, b.state[x][0]), b.state[x][0]) {
 				roomIndex := b.state[x][0].roomIndex()
-				if b.state[roomIndex][2] == nil {
-					moves = append(moves, [2][3]int{
-						{x, 0, b.state[x][0].moveCost(distance(x, roomIndex, 0, 2))},
-						{roomIndex, 2, 0},
-					})
-					continue
+				for _, y := range []int{4, 3, 2, 1} {
+					if b.state[roomIndex][y] == nil {
+						moves = append(moves, [2][3]int{
+							{x, 0, b.state[x][0].moveCost(distance(x, roomIndex, 0, y))},
+							{roomIndex, y, 0},
+						})
+						break
+					}
 				}
-				moves = append(moves, [2][3]int{
-					{x, 0, b.state[x][0].moveCost(distance(x, roomIndex, 0, 1))},
-					{roomIndex, 1, 0},
-				})
 			}
 		}
 	}
@@ -236,8 +263,15 @@ func (b Board) pathExists(x int, a *Amphipods) bool {
 		return false
 	}
 
+	isFinalRoom := func(x, y int) bool {
+		return b.state[x][y] != nil && b.state[x][y].isFinalRoom(x, y)
+	}
+
 	if x == a.roomIndex() {
-		return (b.state[x][2] == nil && b.state[x][1] == nil) || (b.state[x][2] != nil && b.state[x][2].isFinalRoom(x, 2) && b.state[x][1] == nil)
+		return (b.state[x][4] == nil && b.state[x][3] == nil && b.state[x][2] == nil && b.state[x][1] == nil) ||
+			isFinalRoom(x, 4) && b.state[x][3] == nil && b.state[x][2] == nil && b.state[x][1] == nil ||
+			isFinalRoom(x, 4) && isFinalRoom(x, 3) && b.state[x][2] == nil && b.state[x][1] == nil ||
+			isFinalRoom(x, 4) && isFinalRoom(x, 3) && isFinalRoom(x, 2) && b.state[x][1] == nil
 	}
 	return b.pathExists(next(x, a), a)
 }
@@ -265,11 +299,6 @@ func silver(b Board, cost int) (int, bool) {
 
 	if value, cached := cache[boardString]; cached {
 		return value.Value, value.Valid
-	}
-
-	if b.isFinal() {
-		cache[boardString] = Cache{0, true}
-		return 0, true
 	}
 
 	var costs []int
