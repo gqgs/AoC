@@ -47,33 +47,23 @@ func generateZ3(w io.Writer, instructions []string) {
 		case strings.HasPrefix(instruction, "add"):
 			var op1, op2 string
 			fmt.Sscanf(instruction, "add %s %s", &op1, &op2)
-			last := lastOP(op1)
-			new := newOP(op1)
-			fmt.Fprintf(w, "(assert (= %s (+ %s %s)))\n", new, last, parseOperand(op2))
+			fmt.Fprintf(w, "(assert (= %[2]s (+ %[1]s %[3]s)))\n", lastOP(op1), newOP(op1), parseOperand(op2))
 		case strings.HasPrefix(instruction, "mul"):
 			var op1, op2 string
 			fmt.Sscanf(instruction, "mul %s %s", &op1, &op2)
-			last := lastOP(op1)
-			new := newOP(op1)
-			fmt.Fprintf(w, "(assert (= %s (* %s %s)))\n", new, last, parseOperand(op2))
+			fmt.Fprintf(w, "(assert (= %[2]s (* %[1]s %[3]s)))\n", lastOP(op1), newOP(op1), parseOperand(op2))
 		case strings.HasPrefix(instruction, "div"):
 			var op1, op2 string
 			fmt.Sscanf(instruction, "div %s %s", &op1, &op2)
-			last := lastOP(op1)
-			new := newOP(op1)
-			fmt.Fprintf(w, "(assert (= %s (div %s %s)))\n", new, last, parseOperand(op2))
+			fmt.Fprintf(w, "(assert (= %[2]s (div %[1]s %[3]s)))\n", lastOP(op1), newOP(op1), parseOperand(op2))
 		case strings.HasPrefix(instruction, "mod"):
 			var op1, op2 string
 			fmt.Sscanf(instruction, "mod %s %s\n", &op1, &op2)
-			last := lastOP(op1)
-			new := newOP(op1)
-			fmt.Fprintf(w, "(assert (= %s (mod %s %s)))\n", new, last, parseOperand(op2))
+			fmt.Fprintf(w, "(assert (= %[2]s (mod %[1]s %[3]s)))\n", lastOP(op1), newOP(op1), parseOperand(op2))
 		case strings.HasPrefix(instruction, "eql"):
 			var op1, op2 string
 			fmt.Sscanf(instruction, "eql %s %s", &op1, &op2)
-			last := lastOP(op1)
-			new := newOP(op1)
-			fmt.Fprintf(w, "(assert (= %s (ite (= %s %s) 1  0)))\n", new, last, parseOperand(op2))
+			fmt.Fprintf(w, "(assert (= %[2]s (ite (= %[1]s %[3]s) 1  0)))\n", lastOP(op1), newOP(op1), parseOperand(op2))
 		}
 	}
 
