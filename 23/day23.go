@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"os"
 	"sort"
 
@@ -18,26 +17,6 @@ func solve() error {
 
 	// TODO: properly parse this from input file
 	board := new(Board)
-	// board.addAmphipods(Bronze, 2, 1)
-	// board.addAmphipods(Desert, 2, 2)
-	// board.addAmphipods(Desert, 2, 3)
-	// board.addAmphipods(Amber, 2, 4)
-
-	// board.addAmphipods(Copper, 4, 1)
-	// board.addAmphipods(Copper, 4, 2)
-	// board.addAmphipods(Bronze, 4, 3)
-	// board.addAmphipods(Desert, 4, 4)
-
-	// board.addAmphipods(Bronze, 6, 1)
-	// board.addAmphipods(Bronze, 6, 2)
-	// board.addAmphipods(Amber, 6, 3)
-	// board.addAmphipods(Copper, 6, 4)
-
-	// board.addAmphipods(Desert, 8, 1)
-	// board.addAmphipods(Amber, 8, 2)
-	// board.addAmphipods(Copper, 8, 3)
-	// board.addAmphipods(Amber, 8, 4)
-
 	board.addAmphipods(Desert, 2, 1)
 	board.addAmphipods(Desert, 2, 2)
 	board.addAmphipods(Desert, 2, 3)
@@ -58,7 +37,7 @@ func solve() error {
 	board.addAmphipods(Copper, 8, 3)
 	board.addAmphipods(Bronze, 8, 4)
 
-	println(silver(*board, 0))
+	println(gold(*board, 0))
 
 	return nil
 }
@@ -158,10 +137,6 @@ func typeString(t int) string {
 func (b Board) validMoves() [][2][3]int {
 	var moves [][2][3]int
 	var isBlockinDoor bool
-<<<<<<< HEAD
-
-=======
->>>>>>> 299dcab (Day 24)
 	// at the front of room door
 	for _, x := range []int{2, 4, 6, 8} {
 		if b.state[x][0] != nil {
@@ -285,7 +260,7 @@ type Cache struct {
 
 var globalMin = 1<<63 - 1
 
-func silver(b Board, cost int) (int, bool) {
+func gold(b Board, cost int) (int, bool) {
 	boardString := sha256.Sum224([]byte(b.String()))
 
 	if cost >= globalMin {
@@ -314,7 +289,7 @@ func silver(b Board, cost int) (int, bool) {
 
 	for _, move := range moves {
 		b.state[move[0][0]][move[0][1]], b.state[move[1][0]][move[1][1]] = b.state[move[1][0]][move[1][1]], b.state[move[0][0]][move[0][1]]
-		subcost, exists := silver(b, cost+move[0][2])
+		subcost, exists := gold(b, cost+move[0][2])
 		if exists {
 			costs = append(costs, move[0][2]+subcost)
 		}
