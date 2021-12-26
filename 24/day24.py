@@ -4,7 +4,7 @@ set_option("parallel.enable", True)
 set_option("tactic.default_tactic", "psmt")
 
 def solve(objectiveFn):
-    s = Solver()
+    s = SolverFor("QF_LIA")
     x0 = Int('x0')
     y0 = Int('y0')
     w0 = Int('w0')
