@@ -3,6 +3,8 @@ package main
 import (
 	"bufio"
 	"os"
+
+	"github.com/gqgs/AoC2021/generic"
 )
 
 func priority(c rune) int {
@@ -13,12 +15,12 @@ func priority(c rune) int {
 }
 
 func overlap(left, right string) int {
-	set := make(map[rune]struct{})
+	set := generic.NewSet[rune]()
 	for _, c := range left {
-		set[c] = struct{}{}
+		set.Add(c)
 	}
 	for _, c := range right {
-		if _, s := set[c]; s {
+		if set.Contains(c) {
 			return priority(c)
 		}
 	}
@@ -35,19 +37,19 @@ func silver(list [][2]string) int {
 }
 
 func overlap3(l1, l2, l3 string) int {
-	set1 := make(map[rune]struct{})
-	set2 := make(map[rune]struct{})
+	set1 := generic.NewSet[rune]()
 	for _, c := range l1 {
-		set1[c] = struct{}{}
+		set1.Add(c)
 	}
+
+	set2 := generic.NewSet[rune]()
 	for _, c := range l2 {
-		set2[c] = struct{}{}
+		set2.Add(c)
 	}
+
 	for _, c := range l3 {
-		if _, s1 := set1[c]; s1 {
-			if _, s2 := set2[c]; s2 {
-				return priority(c)
-			}
+		if set1.Contains(c) && set2.Contains(c) {
+			return priority(c)
 		}
 	}
 	panic("not found")

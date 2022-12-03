@@ -7,6 +7,39 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
+type Set[T comparable] map[T]struct{}
+
+func (s Set[T]) Contains(e T) bool {
+	for ss := range s {
+		if e == ss {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Set[T]) Add(e T) {
+	(*s)[e] = struct{}{}
+}
+
+func (s Set[T]) Intersect(s2 Set[T]) Set[T] {
+	intersection := make(Set[T])
+	for ss := range s {
+		if s2.Contains(ss) {
+			intersection.Add(ss)
+		}
+	}
+	return intersection
+}
+
+func NewSet[T comparable](l ...T) Set[T] {
+	set := make(Set[T])
+	for _, e := range l {
+		set[e] = struct{}{}
+	}
+	return set
+}
+
 func Min[T constraints.Ordered](l ...T) (min T) {
 	min = l[0]
 	for _, e := range l[1:] {
