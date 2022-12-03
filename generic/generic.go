@@ -1,9 +1,10 @@
 package generic
 
 import (
-	"constraints"
 	heaplib "container/heap"
 	"math/rand"
+
+	"golang.org/x/exp/constraints"
 )
 
 func Min[T constraints.Ordered](l ...T) (min T) {
