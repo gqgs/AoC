@@ -22,7 +22,8 @@ func dependencyGraph(intructions []Instruction, g Graph) Graph {
 	}
 
 	next := intructions[0]
-	g[string(next)] = next.Dependencies()
+	operand, dependencies := next.Dependencies()
+	g[string(operand)] = dependencies
 	return dependencyGraph(intructions[1:], g)
 }
 
@@ -39,10 +40,10 @@ func (o Operand) IsIdentifier() bool {
 	return err != nil
 }
 
-func (i Instruction) Dependencies() (dependencies []string) {
+func (i Instruction) Dependencies() (dst Operand, dependencies []string) {
 	switch {
 	case strings.Contains(string(i), "AND"):
-		var src1, src2, dst Operand
+		var src1, src2 Operand
 		fmt.Sscanf(string(i), "%s AND %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
@@ -52,7 +53,7 @@ func (i Instruction) Dependencies() (dependencies []string) {
 		}
 
 	case strings.Contains(string(i), "OR"):
-		var src1, src2, dst Operand
+		var src1, src2 Operand
 		fmt.Sscanf(string(i), "%s OR %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
@@ -62,7 +63,7 @@ func (i Instruction) Dependencies() (dependencies []string) {
 		}
 
 	case strings.Contains(string(i), "LSHIFT"):
-		var src1, src2, dst Operand
+		var src1, src2 Operand
 		fmt.Sscanf(string(i), "%s LSHIFT %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
@@ -72,7 +73,7 @@ func (i Instruction) Dependencies() (dependencies []string) {
 		}
 
 	case strings.Contains(string(i), "RSHIFT"):
-		var src1, src2, dst Operand
+		var src1, src2 Operand
 		fmt.Sscanf(string(i), "%s RSHIFT %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
@@ -82,14 +83,14 @@ func (i Instruction) Dependencies() (dependencies []string) {
 		}
 
 	case strings.HasPrefix(string(i), "NOT"):
-		var src, dst Operand
+		var src Operand
 		fmt.Sscanf(string(i), "NOT %s -> %s", &src, &dst)
 		if src.IsIdentifier() {
 			dependencies = append(dependencies, string(src))
 		}
 
 	default:
-		var src, dst Operand
+		var src Operand
 		fmt.Sscanf(string(i), "%s -> %s", &src, &dst)
 		if src.IsIdentifier() {
 			dependencies = append(dependencies, string(src))
