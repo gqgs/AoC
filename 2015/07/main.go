@@ -9,8 +9,12 @@ import (
 	"strings"
 )
 
+type Table map[string]Instruction
 type Operand string
-type Instruction string
+type Instruction struct {
+	Raw               string
+	InstructionsTable *Table
+}
 type State map[Operand]uint16
 
 // id -> dependencies
@@ -27,24 +31,11 @@ func dependencyGraph(intructions []Instruction, g Graph) Graph {
 	return dependencyGraph(intructions[1:], g)
 }
 
-func (o Operand) Value(state State) uint16 {
-	result, err := strconv.ParseUint(string(o), 10, 16)
-	if err == nil {
-		return uint16(result)
-	}
-	return state[o]
-}
-
-func (o Operand) IsIdentifier() bool {
-	_, err := strconv.ParseUint(string(o), 10, 16)
-	return err != nil
-}
-
 func (i Instruction) Dependencies() (dst Operand, dependencies []string) {
 	switch {
-	case strings.Contains(string(i), "AND"):
+	case strings.Contains(i.Raw, "AND"):
 		var src1, src2 Operand
-		fmt.Sscanf(string(i), "%s AND %s -> %s", &src1, &src2, &dst)
+		fmt.Sscanf(i.Raw, "%s AND %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
 		}
@@ -52,9 +43,9 @@ func (i Instruction) Dependencies() (dst Operand, dependencies []string) {
 			dependencies = append(dependencies, string(src2))
 		}
 
-	case strings.Contains(string(i), "OR"):
+	case strings.Contains(i.Raw, "OR"):
 		var src1, src2 Operand
-		fmt.Sscanf(string(i), "%s OR %s -> %s", &src1, &src2, &dst)
+		fmt.Sscanf(i.Raw, "%s OR %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
 		}
@@ -62,9 +53,9 @@ func (i Instruction) Dependencies() (dst Operand, dependencies []string) {
 			dependencies = append(dependencies, string(src2))
 		}
 
-	case strings.Contains(string(i), "LSHIFT"):
+	case strings.Contains(i.Raw, "LSHIFT"):
 		var src1, src2 Operand
-		fmt.Sscanf(string(i), "%s LSHIFT %s -> %s", &src1, &src2, &dst)
+		fmt.Sscanf(i.Raw, "%s LSHIFT %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
 		}
@@ -72,9 +63,9 @@ func (i Instruction) Dependencies() (dst Operand, dependencies []string) {
 			dependencies = append(dependencies, string(src2))
 		}
 
-	case strings.Contains(string(i), "RSHIFT"):
+	case strings.Contains(i.Raw, "RSHIFT"):
 		var src1, src2 Operand
-		fmt.Sscanf(string(i), "%s RSHIFT %s -> %s", &src1, &src2, &dst)
+		fmt.Sscanf(i.Raw, "%s RSHIFT %s -> %s", &src1, &src2, &dst)
 		if src1.IsIdentifier() {
 			dependencies = append(dependencies, string(src1))
 		}
@@ -82,16 +73,16 @@ func (i Instruction) Dependencies() (dst Operand, dependencies []string) {
 			dependencies = append(dependencies, string(src2))
 		}
 
-	case strings.HasPrefix(string(i), "NOT"):
+	case strings.HasPrefix(i.Raw, "NOT"):
 		var src Operand
-		fmt.Sscanf(string(i), "NOT %s -> %s", &src, &dst)
+		fmt.Sscanf(i.Raw, "NOT %s -> %s", &src, &dst)
 		if src.IsIdentifier() {
 			dependencies = append(dependencies, string(src))
 		}
 
 	default:
 		var src Operand
-		fmt.Sscanf(string(i), "%s -> %s", &src, &dst)
+		fmt.Sscanf(i.Raw, "%s -> %s", &src, &dst)
 		if src.IsIdentifier() {
 			dependencies = append(dependencies, string(src))
 		}
@@ -99,47 +90,69 @@ func (i Instruction) Dependencies() (dst Operand, dependencies []string) {
 	return
 }
 
-func (i Instruction) Eval(state State) State {
+func (o Operand) IsIdentifier() bool {
+	_, err := strconv.ParseUint(string(o), 10, 16)
+	return err != nil
+}
+
+func (t Table) IdValue(op Operand) uint16 {
+	result, err := strconv.ParseUint(string(op), 10, 16)
+	if err == nil {
+		return uint16(result)
+	}
+	return t[string(op)].Value()
+}
+
+var memoization = make(map[string]uint16)
+
+func (i Instruction) Value() uint16 {
+	// fmt.Printf("value: %#v\n", i)
+	if i.Raw == "" {
+		panic("empty value")
+	}
+	if res, ok := memoization[i.Raw]; ok {
+		return res
+	}
+
+	var res uint16
 	switch {
-	case strings.Contains(string(i), "AND"):
+	case strings.Contains(i.Raw, "AND"):
 		var src1, src2, dst Operand
-		fmt.Sscanf(string(i), "%s AND %s -> %s", &src1, &src2, &dst)
-		state[dst] = src1.Value(state) & src2.Value(state)
+		fmt.Sscanf(i.Raw, "%s AND %s -> %s", &src1, &src2, &dst)
+		res = i.InstructionsTable.IdValue(src1) & i.InstructionsTable.IdValue(src2)
 
-	case strings.Contains(string(i), "OR"):
+	case strings.Contains(i.Raw, "OR"):
 		var src1, src2, dst Operand
-		fmt.Sscanf(string(i), "%s OR %s -> %s", &src1, &src2, &dst)
-		state[dst] = src1.Value(state) | src2.Value(state)
+		fmt.Sscanf(i.Raw, "%s OR %s -> %s", &src1, &src2, &dst)
+		res = i.InstructionsTable.IdValue(src1) | i.InstructionsTable.IdValue(src2)
 
-	case strings.Contains(string(i), "LSHIFT"):
+	case strings.Contains(i.Raw, "LSHIFT"):
 		var src1, src2, dst Operand
-		fmt.Sscanf(string(i), "%s LSHIFT %s -> %s", &src1, &src2, &dst)
-		state[dst] = src1.Value(state) << src2.Value(state)
+		fmt.Sscanf(i.Raw, "%s LSHIFT %s -> %s", &src1, &src2, &dst)
+		res = i.InstructionsTable.IdValue(src1) << i.InstructionsTable.IdValue(src2)
 
-	case strings.Contains(string(i), "RSHIFT"):
+	case strings.Contains(i.Raw, "RSHIFT"):
 		var src1, src2, dst Operand
-		fmt.Sscanf(string(i), "%s RSHIFT %s -> %s", &src1, &src2, &dst)
-		state[dst] = src1.Value(state) >> src2.Value(state)
+		fmt.Sscanf(i.Raw, "%s RSHIFT %s -> %s", &src1, &src2, &dst)
+		res = i.InstructionsTable.IdValue(src1) >> i.InstructionsTable.IdValue(src2)
 
-	case strings.HasPrefix(string(i), "NOT"):
+	case strings.HasPrefix(i.Raw, "NOT"):
 		var src, dst Operand
-		fmt.Sscanf(string(i), "NOT %s -> %s", &src, &dst)
-		state[dst] = src.Value(state) ^ 65_535
+		fmt.Sscanf(i.Raw, "NOT %s -> %s", &src, &dst)
+		res = i.InstructionsTable.IdValue(src) ^ 65_535
 
 	default:
 		var src, dst Operand
-		fmt.Sscanf(string(i), "%s -> %s", &src, &dst)
-		state[dst] = src.Value(state)
+		fmt.Sscanf(i.Raw, "%s -> %s", &src, &dst)
+		res = i.InstructionsTable.IdValue(src)
 	}
-	return state
+
+	memoization[i.Raw] = res
+	return res
 }
 
-func run(instuctions []Instruction, state State) State {
-	if len(instuctions) == 0 {
-		return state
-	}
-
-	return run(instuctions[1:], instuctions[0].Eval(state))
+func run(id string, instructionsById map[string]Instruction) int {
+	return 0
 }
 
 func solve() error {
@@ -152,16 +165,17 @@ func solve() error {
 	var instuctions []Instruction
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		instuctions = append(instuctions, Instruction(scanner.Text()))
+		instuctions = append(instuctions, Instruction{Raw: scanner.Text()})
 	}
 
-	// for key, value := range run(instuctions, make(State)) {
-	// 	fmt.Println(key, value)
-	// }
-
-	for key, value := range dependencyGraph(instuctions, make(Graph)) {
-		fmt.Println(key, value)
+	instructionsById := make(Table)
+	for _, instruction := range instuctions {
+		_, id, _ := strings.Cut(string(instruction.Raw), "-> ")
+		instruction.InstructionsTable = &instructionsById
+		instructionsById[id] = instruction
 	}
+
+	fmt.Println(instructionsById["a"].Value())
 
 	return nil
 }
