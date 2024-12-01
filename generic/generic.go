@@ -67,6 +67,10 @@ func (s *Stack[T]) Pop() T {
 	return r
 }
 
+func (s Stack[T]) Empty() bool {
+	return len(s) == 0
+}
+
 type heap[T any] struct {
 	stack    Stack[T]
 	lessFunc func(x, y T) bool

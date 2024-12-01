@@ -30,6 +30,9 @@ func solve() error {
 	var lines []string
 	for scanner.Scan() {
 		next := scanner.Text()
+		if len(next) == 0 {
+			continue
+		}
 		lines = append(lines, next)
 	}
 
