@@ -1,21 +1,16 @@
 package generic
 
 import (
+	"cmp"
 	heaplib "container/heap"
 	"math/rand"
-
-	"golang.org/x/exp/constraints"
 )
 
 type Set[T comparable] map[T]struct{}
 
 func (s Set[T]) Contains(e T) bool {
-	for ss := range s {
-		if e == ss {
-			return true
-		}
-	}
-	return false
+	_, exists := s[e]
+	return exists
 }
 
 func (s *Set[T]) Add(e T) {
@@ -40,7 +35,7 @@ func NewSet[T comparable](l ...T) Set[T] {
 	return set
 }
 
-func Abs[T int | byte](a T) int {
+func Abs[T int](a T) int {
 	if a < 0 {
 		return -int(a)
 	}
@@ -77,12 +72,12 @@ type heap[T any] struct {
 	lessFunc func(x, y T) bool
 }
 
-func (h heap[T]) Len() int            { return len(h.stack) }
-func (h heap[T]) Less(i, j int) bool  { return h.lessFunc(h.stack[i], h.stack[j]) }
-func (h heap[T]) Swap(i, j int)       { h.stack[i], h.stack[j] = h.stack[j], h.stack[i] }
-func (h heap[T]) Min() T              { return h.stack[0] }
-func (h *heap[T]) Push(x interface{}) { h.stack.Push(x.(T)) }
-func (h *heap[T]) Pop() interface{}   { return h.stack.Pop() }
+func (h heap[T]) Len() int           { return len(h.stack) }
+func (h heap[T]) Less(i, j int) bool { return h.lessFunc(h.stack[i], h.stack[j]) }
+func (h heap[T]) Swap(i, j int)      { h.stack[i], h.stack[j] = h.stack[j], h.stack[i] }
+func (h heap[T]) Min() T             { return h.stack[0] }
+func (h *heap[T]) Push(x any)        { h.stack.Push(x.(T)) }
+func (h *heap[T]) Pop() any          { return h.stack.Pop() }
 
 func NewMinHeap[T any](lessFunc func(e1, e2 T) bool) MinHeap[T] {
 	return MinHeap[T]{
@@ -104,11 +99,11 @@ func (h *MinHeap[T]) Push(l ...T) {
 	}
 }
 
-func QuickSelect[T constraints.Ordered](list []T, k int) T {
+func QuickSelect[T cmp.Ordered](list []T, k int) T {
 	return selectKth(list, 0, len(list)-1, k)
 }
 
-func selectKth[T constraints.Ordered](list []T, left, right, k int) T {
+func selectKth[T cmp.Ordered](list []T, left, right, k int) T {
 	for {
 		if left == right {
 			return list[left]
@@ -125,7 +120,7 @@ func selectKth[T constraints.Ordered](list []T, left, right, k int) T {
 	}
 }
 
-func partition[T constraints.Ordered](list []T, left, right, pivotIndex int) int {
+func partition[T cmp.Ordered](list []T, left, right, pivotIndex int) int {
 	pivot := list[pivotIndex]
 	list[pivotIndex], list[right] = list[right], list[pivotIndex]
 	storeIndex := left
