@@ -160,7 +160,7 @@ Next:
 			if i == j {
 				continue
 			}
-			maxDistance = generic.Max(maxDistance, manhattanDistance(scanners[i], scanners[j]))
+			maxDistance = max(maxDistance, manhattanDistance(scanners[i], scanners[j]))
 		}
 	}
 

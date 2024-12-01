@@ -5,11 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/gqgs/AoC2021/generic"
 )
-
-var max = generic.Max[int]
 
 func solve() error {
 	file, err := os.Open(os.Args[1])

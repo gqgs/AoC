@@ -13,8 +13,6 @@ func castRune(c byte) int {
 	return int(c - '0')
 }
 
-var min = generic.Min[byte]
-
 func findMinPoints(input []string) [][]int {
 	var points [][]int
 	for y := 1; y < len(input)-1; y++ {

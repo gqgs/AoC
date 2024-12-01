@@ -6,12 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/gqgs/AoC2021/generic"
 )
-
-var max = generic.Max[int]
-var min = generic.Min[int]
 
 func solve() error {
 	file, err := os.Open("day4")

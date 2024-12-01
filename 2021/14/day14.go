@@ -5,12 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
-
-	"github.com/gqgs/AoC2021/generic"
 )
-
-var min = generic.Min[int]
-var max = generic.Max[int]
 
 func minMaxDiff(initialState string, transitionGraph map[string]string, n int) int {
 	counter := make(map[string]int)

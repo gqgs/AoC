@@ -10,9 +10,6 @@ import (
 
 const gridSize = 10
 
-var min = generic.Min[int]
-var max = generic.Max[int]
-
 type Stack = generic.Stack[[2]int]
 
 func solve() {

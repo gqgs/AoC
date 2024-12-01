@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/gqgs/AoC2021/generic"
 )
 
 type Step struct {
@@ -140,14 +138,14 @@ func volume(s Step) int {
 
 func intersect(s0, s1 Step) (Step, bool) {
 	var s Step
-	s.X0 = generic.Max(s0.X0, s1.X0)
-	s.X1 = generic.Min(s0.X1, s1.X1)
+	s.X0 = max(s0.X0, s1.X0)
+	s.X1 = min(s0.X1, s1.X1)
 
-	s.Y0 = generic.Max(s0.Y0, s1.Y0)
-	s.Y1 = generic.Min(s0.Y1, s1.Y1)
+	s.Y0 = max(s0.Y0, s1.Y0)
+	s.Y1 = min(s0.Y1, s1.Y1)
 
-	s.Z0 = generic.Max(s0.Z0, s1.Z0)
-	s.Z1 = generic.Min(s0.Z1, s1.Z1)
+	s.Z0 = max(s0.Z0, s1.Z0)
+	s.Z1 = min(s0.Z1, s1.Z1)
 
 	return s, s.X0 <= s.X1 && s.Y0 <= s.Y1 && s.Z0 <= s.Z1
 }

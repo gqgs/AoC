@@ -3,8 +3,7 @@ package main
 import (
 	"bufio"
 	"os"
-
-	"github.com/gqgs/AoC2021/generic"
+	"slices"
 )
 
 func isVisible(input []string, i, j int) int {
@@ -75,7 +74,7 @@ func gold(input []string) int {
 			scores = append(scores, scenicScore(input, i, j))
 		}
 	}
-	return generic.Max(scores...)
+	return slices.Max(scores)
 }
 
 func solve() error {

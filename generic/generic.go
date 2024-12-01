@@ -40,26 +40,6 @@ func NewSet[T comparable](l ...T) Set[T] {
 	return set
 }
 
-func Min[T constraints.Ordered](l ...T) (min T) {
-	min = l[0]
-	for _, e := range l[1:] {
-		if e < min {
-			min = e
-		}
-	}
-	return
-}
-
-func Max[T constraints.Ordered](l ...T) (max T) {
-	max = l[0]
-	for _, e := range l[1:] {
-		if e > max {
-			max = e
-		}
-	}
-	return
-}
-
 func Abs[T int | byte](a T) int {
 	if a < 0 {
 		return -int(a)

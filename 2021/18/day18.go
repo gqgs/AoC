@@ -7,9 +7,8 @@ import (
 	"io"
 	"math"
 	"os"
+	"slices"
 	"strings"
-
-	"github.com/gqgs/AoC2021/generic"
 )
 
 type Number struct {
@@ -72,7 +71,7 @@ func (n Number) Max() float64 {
 		values = append(values, n.Right.Max())
 	}
 
-	return generic.Max(values...)
+	return slices.Max(values)
 }
 
 func (n Number) Nested() int {
@@ -86,7 +85,7 @@ func (n Number) Nested() int {
 	if n.Right != nil {
 		depths = append(depths, n.Right.Nested())
 	}
-	return 1 + generic.Max(depths...)
+	return 1 + slices.Max(depths)
 }
 
 func (n Number) magnitude() float64 {
@@ -276,7 +275,7 @@ func gold(input []string) {
 		}
 	}
 
-	println("gold:", generic.Max(magnitudes...))
+	println("gold:", slices.Max(magnitudes))
 }
 
 func solve() error {

@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"os"
+	"slices"
 	"sort"
 
 	"github.com/gqgs/AoC2021/generic"
@@ -268,7 +269,7 @@ func gold(b Board, cost int) (int, bool) {
 	}
 
 	if b.isFinal() {
-		globalMin = generic.Min(globalMin, cost)
+		globalMin = min(globalMin, cost)
 		return 0, true
 	}
 
@@ -301,7 +302,7 @@ func gold(b Board, cost int) (int, bool) {
 		return 0, false
 	}
 
-	min := generic.Min(costs...)
+	min := slices.Min(costs)
 	cache[boardString] = Cache{min, true}
 	return min, true
 }

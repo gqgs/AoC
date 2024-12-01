@@ -105,7 +105,7 @@ func eval(token []Token) int {
 			updated.Length += next.Length
 			token[i].RequiredSubpackets--
 			token[i].SubpacketsLength -= next.Length
-			for generic.Max(token[i].RequiredSubpackets, token[i].SubpacketsLength) > 0 {
+			for max(token[i].RequiredSubpackets, token[i].SubpacketsLength) > 0 {
 				next := stack.Pop()
 				updated.Length += next.Length
 				if cmpFunc[decodecOP](next, updated) {
@@ -119,7 +119,7 @@ func eval(token []Token) int {
 			updated := Token{}
 			updated.Length = token[i].Length
 			updated.Value = 0
-			for generic.Max(token[i].RequiredSubpackets, token[i].SubpacketsLength) > 0 {
+			for max(token[i].RequiredSubpackets, token[i].SubpacketsLength) > 0 {
 				next := stack.Pop()
 				updated.Value += next.Value
 				updated.Length += next.Length
@@ -131,7 +131,7 @@ func eval(token []Token) int {
 			updated := Token{}
 			updated.Value = 1
 			updated.Length = token[i].Length
-			for generic.Max(token[i].RequiredSubpackets, token[i].SubpacketsLength) > 0 {
+			for max(token[i].RequiredSubpackets, token[i].SubpacketsLength) > 0 {
 				next := stack.Pop()
 				updated.Value *= next.Value
 				updated.Length += next.Length

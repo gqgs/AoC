@@ -76,8 +76,8 @@ func silver(minX, maxX, minY, maxY int) (int, int) {
 						continue
 					}
 					localYMax := (v0 + 0.5) * (v0 + 0.5) * 0.5
-					globalYMax = generic.Max(globalYMax, localYMax)
-					globalMaxYV0 = generic.Max(globalMaxYV0, generic.Abs(int(v0)))
+					globalYMax = max(globalYMax, localYMax)
+					globalMaxYV0 = max(globalMaxYV0, generic.Abs(int(v0)))
 				}
 
 			}
