@@ -38,7 +38,7 @@ func (p Point) Adjacent() [][2]int {
 
 func Fill(lines []string, fillChar string) []string {
 	result := make([]string, 0, len(lines)+2)
-	fillLine := strings.Repeat(".", len(lines[0])+2)
+	fillLine := strings.Repeat(fillChar, len(lines[0])+2)
 
 	result = append(result, fillLine)
 	for _, line := range lines {
