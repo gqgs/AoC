@@ -13,9 +13,13 @@ import (
 )
 
 func isSafe(numbers []int) bool {
+	if !sort.IntsAreSorted(numbers) {
+		return false
+	}
+
 	reversed := slices.Clone(numbers)
 	slices.Reverse(reversed)
-	if !sort.IntsAreSorted(numbers) && !sort.IntsAreSorted(reversed) {
+	if !sort.IntsAreSorted(reversed) {
 		return false
 	}
 
