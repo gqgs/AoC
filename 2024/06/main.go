@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"maps"
 	"os"
 
 	"github.com/gqgs/AoC2021/generic"
@@ -36,28 +37,100 @@ func next(p *grid.Point, direction int) {
 	p.Y += directions[direction][1]
 }
 
+// func silver(lines []string) int {
+// 	visited := make(map[string]struct{})
+// 	initPosition := findGuardPosition(lines)
+
+// 	direction := 0
+// 	s := initPosition
+// 	for {
+// 		switch v := peak(s, lines, direction); v {
+// 		case '^':
+// 			visited[key(s)] = struct{}{}
+// 			next(&s, direction)
+// 		case '.':
+// 			visited[s.String()] = struct{}{}
+// 			next(&s, direction)
+// 		case '#':
+// 			visited[s.String()] = struct{}{}
+// 			direction = (direction + 1) % 4
+// 		case 'X':
+// 			visited[s.String()] = struct{}{}
+// 			return len(visited)
+// 		}
+// 		fmt.Println("visited", len(visited))
+// 		time.Sleep(time.Second)
+// 	}
+// }
+
+var cycles int
+
 func silver(lines []string) int {
 	visited := make(map[string]struct{})
 	initPosition := findGuardPosition(lines)
 
 	direction := 0
+
+	// fmt.Println("silver", len(lines))
+	// for _, line := range lines {
+	// 	fmt.Println(line)
+	// }
+	// fmt.Println()
+
+	key := func(p grid.Point) string {
+		return fmt.Sprintf("%s-%d", p.String(), direction)
+	}
 	s := initPosition
+	visitedPoints := make(map[string]struct{})
 	for {
+		visitedPoints[s.String()] = struct{}{}
+
+		if _, isCycle := visited[key(s)]; isCycle {
+			for i := range lines {
+				for j := range lines[i] {
+					if i == initPosition.X && j == initPosition.Y {
+						fmt.Printf("\033[0;32m%c\033[0m", '^')
+						continue
+					}
+
+					key := fmt.Sprintf("(%d,%d)", i, j)
+					if _, ok := visitedPoints[key]; ok {
+						fmt.Printf("\033[0;31m%c\033[0m", '*')
+					} else {
+						if lines[i][j] == 'O' {
+							fmt.Printf("\033[0;36m%c\033[0m", 'O')
+						} else {
+							fmt.Printf("%c", lines[i][j])
+						}
+					}
+				}
+				fmt.Println()
+			}
+
+			cycles++
+			if cycles > 50 {
+				os.Exit(1)
+			}
+			return 0
+		}
+
 		v := peak(s, lines, direction)
 		switch v {
 		case '^':
-			visited[s.String()] = struct{}{}
+			visited[key(s)] = struct{}{}
 			next(&s, direction)
 		case '.':
-			visited[s.String()] = struct{}{}
+			visited[key(s)] = struct{}{}
 			next(&s, direction)
-		case '#':
-			visited[s.String()] = struct{}{}
+		case '#', 'O':
+			visited[key(s)] = struct{}{}
 			direction = (direction + 1) % 4
 		case 'X':
-			visited[s.String()] = struct{}{}
+			visited[key(s)] = struct{}{}
 			return len(visited)
 		}
+		// fmt.Printf("visited %d %s %c\n", len(visited), key(s), v)
+		// time.Sleep(time.Second)
 	}
 }
 
@@ -74,21 +147,6 @@ func replace(lines []string, c string, x, y int) []string {
 	return newLines
 }
 
-func gold(lines []string) int {
-	var total int
-	for i := range lines {
-		for j := range lines[i] {
-			switch lines[i][j] {
-			case '#', '^':
-				continue
-			}
-			total += goldAux(replace(lines, "O", i, j))
-		}
-	}
-
-	return total
-}
-
 func nextPoint(p grid.Point, direction int) grid.Point {
 	var directions = [][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
 	return grid.Point{
@@ -97,41 +155,85 @@ func nextPoint(p grid.Point, direction int) grid.Point {
 	}
 }
 
-func goldAux(lines []string) int {
+func gold(lines []string) int {
+	var direction int
 	visited := make(map[string]struct{})
 	initPosition := findGuardPosition(lines)
+	return goldAux(initPosition, direction, lines, visited, false)
+}
 
-	direction := 0
+func goldAux(start grid.Point, direction int, lines []string, visited map[string]struct{}, blocked bool) int {
+	var total int
 	key := func(p grid.Point) string {
 		return fmt.Sprintf("%s-%d", p.String(), direction)
 	}
 
 	stack := new(generic.Stack[grid.Point])
-	stack.Push(initPosition)
+	stack.Push(start)
 
 	for !stack.Empty() {
 		next := stack.Pop()
 		nextKey := key(next)
 		if _, isCycle := visited[nextKey]; isCycle {
+			silver(lines)
 			return 1
 		}
 		visited[nextKey] = struct{}{}
 
-		v := peak(next, lines, direction)
-		switch v {
+		switch v := peak(next, lines, direction); v {
 		case '^':
 			stack.Push(nextPoint(next, direction))
 		case '.':
-			stack.Push(nextPoint(next, direction))
+			np := nextPoint(next, direction)
+			stack.Push(np)
+			if !blocked {
+				total += goldAux(next, (direction+1)%4, replace(lines, "O", np.X, np.Y), maps.Clone(visited), true)
+			}
 		case '#', 'O':
 			stack.Push(next)
 			direction = (direction + 1) % 4
 		case 'X':
-			return 0
+			return total
 		}
 	}
-	return 0
+	return total
 }
+
+// func goldAux(lines []string) int {
+// 	visited := make(map[string]struct{})
+// 	initPosition := findGuardPosition(lines)
+
+// 	direction := 0
+// 	key := func(p grid.Point) string {
+// 		return fmt.Sprintf("%s-%d", p.String(), direction)
+// 	}
+
+// 	stack := new(generic.Stack[grid.Point])
+// 	stack.Push(initPosition)
+
+// 	for !stack.Empty() {
+// 		next := stack.Pop()
+// 		nextKey := key(next)
+// 		if _, isCycle := visited[nextKey]; isCycle {
+// 			return 1
+// 		}
+// 		visited[nextKey] = struct{}{}
+
+// 		v := peak(next, lines, direction)
+// 		switch v {
+// 		case '^':
+// 			stack.Push(nextPoint(next, direction))
+// 		case '.':
+// 			stack.Push(nextPoint(next, direction))
+// 		case '#', 'O':
+// 			stack.Push(next)
+// 			direction = (direction + 1) % 4
+// 		case 'X':
+// 			return 0
+// 		}
+// 	}
+// 	return 0
+// }
 
 func solve() error {
 	file, err := os.Open(os.Args[1])
