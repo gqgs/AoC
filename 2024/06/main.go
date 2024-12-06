@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gqgs/AoC2021/generic"
 	"github.com/gqgs/AoC2021/grid"
 )
 
@@ -88,37 +89,48 @@ func gold(lines []string) int {
 	return total
 }
 
+func nextPoint(p grid.Point, direction int) grid.Point {
+	var directions = [][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	return grid.Point{
+		X: p.X + directions[direction][0],
+		Y: p.Y + directions[direction][1],
+	}
+}
+
 func goldAux(lines []string) int {
 	visited := make(map[string]struct{})
 	initPosition := findGuardPosition(lines)
 
 	direction := 0
-	s := initPosition
-
-	key := func() string {
-		return fmt.Sprintf("%s-%d", s.String(), direction)
+	key := func(p grid.Point) string {
+		return fmt.Sprintf("%s-%d", p.String(), direction)
 	}
 
-	for {
-		if _, ok := visited[key()]; ok {
+	stack := new(generic.Stack[grid.Point])
+	stack.Push(initPosition)
+
+	for !stack.Empty() {
+		next := stack.Pop()
+		nextKey := key(next)
+		if _, isCycle := visited[nextKey]; isCycle {
 			return 1
 		}
-		v := peak(s, lines, direction)
+		visited[nextKey] = struct{}{}
+
+		v := peak(next, lines, direction)
 		switch v {
 		case '^':
-			visited[key()] = struct{}{}
-			next(&s, direction)
+			stack.Push(nextPoint(next, direction))
 		case '.':
-			visited[key()] = struct{}{}
-			next(&s, direction)
+			stack.Push(nextPoint(next, direction))
 		case '#', 'O':
-			visited[key()] = struct{}{}
+			stack.Push(next)
 			direction = (direction + 1) % 4
 		case 'X':
-			visited[key()] = struct{}{}
 			return 0
 		}
 	}
+	return 0
 }
 
 func solve() error {
