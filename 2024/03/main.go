@@ -11,7 +11,7 @@ import (
 func silver(lines []string) int {
 	var total int
 	line := strings.Join(lines, "")
-	re := regexp.MustCompile(`mul\([0-9]+,[0-9]+\)`)
+	re := regexp.MustCompile(`mul\([\d+]{1,3},[\d+]{1,3}\)`)
 	matches := re.FindAllString(line, -1)
 	for _, match := range matches {
 		var first, second int
@@ -24,7 +24,7 @@ func silver(lines []string) int {
 func gold(lines []string) int {
 	var total int
 	line := strings.Join(lines, "")
-	re := regexp.MustCompile(`mul\([0-9]+,[0-9]+\)|do\(\)|don\'t\(\)`)
+	re := regexp.MustCompile(`mul\(\d+,\d+\)|do\(\)|don\'t\(\)`)
 	matches := re.FindAllString(line, -1)
 	enabled := true
 	for _, match := range matches {

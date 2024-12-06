@@ -117,7 +117,7 @@ func solve() error {
 		lines = append(lines, next)
 	}
 
-	lines = grid.Fill(lines, ".")
+	lines = grid.Fill(lines, ".", 2)
 
 	println(silver(lines))
 	println(gold(lines))
