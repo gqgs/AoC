@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
+	"sync/atomic"
 )
 
 type Case struct {
@@ -13,7 +15,7 @@ type Case struct {
 	Numbers []int
 }
 
-func compute(target int, current int, numbers []int, gold bool) bool {
+func isValid(target int, current int, numbers []int, gold bool) bool {
 	if target == current && len(numbers) == 0 {
 		return true
 	}
@@ -22,9 +24,9 @@ func compute(target int, current int, numbers []int, gold bool) bool {
 		return false
 	}
 
-	return compute(target, current+numbers[0], numbers[1:], gold) ||
-		compute(target, current*numbers[0], numbers[1:], gold) ||
-		(gold && compute(target, concat(current, numbers[0]), numbers[1:], gold))
+	return isValid(target, current+numbers[0], numbers[1:], gold) ||
+		isValid(target, current*numbers[0], numbers[1:], gold) ||
+		(gold && isValid(target, concat(current, numbers[0]), numbers[1:], gold))
 }
 
 func concat(x, y int) int {
@@ -49,14 +51,20 @@ func shared(lines []string, gold bool) int {
 		})
 	}
 
-	var total int
+	var total int64
+	var wg sync.WaitGroup
+	wg.Add(len(cases))
 	for _, c := range cases {
-		if compute(c.Target, c.Numbers[0], c.Numbers[1:], gold) {
-			total += c.Target
-		}
+		c := c
+		go func() {
+			if isValid(c.Target, c.Numbers[0], c.Numbers[1:], gold) {
+				atomic.AddInt64(&total, int64(c.Target))
+			}
+			wg.Done()
+		}()
 	}
-
-	return total
+	wg.Wait()
+	return int(total)
 }
 
 func silver(lines []string) int {
