@@ -62,6 +62,23 @@ func (p Point) adjacent() [][2]int {
 	}
 }
 
+func Points(lines []string, ignoreChar byte) []Point {
+	var points []Point
+	for i := range lines {
+		for j := range lines[i] {
+			if lines[i][j] == ignoreChar {
+				continue
+			}
+			p := Point{
+				X: i,
+				Y: j,
+			}
+			points = append(points, p)
+		}
+	}
+	return points
+}
+
 func Fill(lines []string, fillChar string, appendSize int) []string {
 	result := make([]string, 0, len(lines)+appendSize)
 	fillLine := strings.Repeat(fillChar, len(lines[0])+appendSize)

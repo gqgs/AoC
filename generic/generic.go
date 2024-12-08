@@ -27,6 +27,18 @@ func (s set[T]) Intersect(s2 set[T]) set[T] {
 	return intersection
 }
 
+func (s set[T]) Union(s2 set[T]) set[T] {
+	union := make(set[T])
+	for ss := range s {
+		union.Add(ss)
+	}
+	for ss := range s2 {
+		union.Add(ss)
+	}
+
+	return union
+}
+
 func NewSet[T comparable](l ...T) set[T] {
 	s := make(set[T])
 	for _, e := range l {

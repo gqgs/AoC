@@ -37,22 +37,10 @@ func isAntinode(c, p1, p2 grid.Point) bool {
 }
 
 func silver(lines []string) int {
-	points := generic.NewSet[grid.Point]()
-	for i := range lines {
-		for j := range lines[i] {
-			if lines[i][j] == '.' {
-				continue
-			}
-			p := grid.Point{
-				X: i,
-				Y: j,
-			}
-			points.Add(p)
-		}
-	}
-
-	limit := len(lines[0])
+	pointList := grid.Points(lines, '.')
+	points := generic.NewSet(pointList...)
 	antinode := generic.NewSet[grid.Point]()
+	limit := len(lines[0])
 	for key := range points {
 	NextPoint:
 		for point := range points {
@@ -84,22 +72,9 @@ func silver(lines []string) int {
 }
 
 func gold(lines []string) int {
+	pointList := grid.Points(lines, '.')
+	points := generic.NewSet(pointList...)
 	antinode := generic.NewSet[grid.Point]()
-	points := generic.NewSet[grid.Point]()
-	for i := range lines {
-		for j := range lines[i] {
-			if lines[i][j] == '.' {
-				continue
-			}
-			p := grid.Point{
-				X: i,
-				Y: j,
-			}
-			points.Add(p)
-			antinode.Add(p)
-		}
-	}
-
 	limit := len(lines[0])
 	for key := range points {
 		for point := range points {
@@ -137,7 +112,7 @@ func gold(lines []string) int {
 		}
 	}
 
-	return len(antinode)
+	return len(antinode.Union(points))
 }
 
 func solve() error {
