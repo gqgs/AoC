@@ -14,8 +14,8 @@ func silver(lines []string) int {
 		parts := strings.Split(strings.Split(line, ": ")[1], " | ")
 		winning := parts[0]
 		numbers := parts[1]
-		winSet := make(generic.Set[string])
-		numbersSet := make(generic.Set[string])
+		winSet := generic.NewSet[string]()
+		numbersSet := generic.NewSet[string]()
 
 		for _, s := range strings.Split(winning, " ") {
 			if len(s) == 0 {
@@ -50,8 +50,8 @@ func gold(lines []string) int {
 		parts := strings.Split(strings.Split(line, ": ")[1], " | ")
 		winning := parts[0]
 		numbers := parts[1]
-		winSet := make(generic.Set[string])
-		numbersSet := make(generic.Set[string])
+		winSet := generic.NewSet[string]()
+		numbersSet := generic.NewSet[string]()
 
 		for _, s := range strings.Split(winning, " ") {
 			if len(s) == 0 {

@@ -3,6 +3,8 @@ package grid
 import (
 	"fmt"
 	"strings"
+
+	"github.com/gqgs/AoC2021/generic"
 )
 
 type Point struct {
@@ -11,6 +13,30 @@ type Point struct {
 
 func (p Point) String() string {
 	return fmt.Sprintf("(%d,%d)", p.X, p.Y)
+}
+
+func (p Point) IsOutBounds(limit int) bool {
+	if p.X < 0 || p.Y < 0 {
+		return true
+	}
+
+	if p.X >= limit || p.Y >= limit {
+		return true
+	}
+
+	return false
+}
+
+func (p Point) VerticalDist(p2 Point) int {
+	return generic.Abs(p.X - p2.X)
+}
+
+func (p Point) HorizontalDist(p2 Point) int {
+	return generic.Abs(p.Y - p2.Y)
+}
+
+func (p Point) Distance(p2 Point) int {
+	return p.VerticalDist(p2) + p.HorizontalDist(p2)
 }
 
 func (p Point) AdjacentFunc(fn func(Point)) {

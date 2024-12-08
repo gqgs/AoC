@@ -55,13 +55,12 @@ func shared(lines []string, gold bool) int {
 	var wg sync.WaitGroup
 	wg.Add(len(cases))
 	for _, c := range cases {
-		c := c
-		go func() {
+		go func(c *Case) {
 			if isValid(c.Target, c.Numbers[0], c.Numbers[1:], gold) {
 				atomic.AddInt64(&total, int64(c.Target))
 			}
 			wg.Done()
-		}()
+		}(c)
 	}
 	wg.Wait()
 	return int(total)
