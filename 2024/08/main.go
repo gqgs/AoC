@@ -54,6 +54,7 @@ func silver(lines []string) int {
 	limit := len(lines[0])
 	antinode := generic.NewSet[grid.Point]()
 	for key := range points {
+	NextPoint:
 		for point := range points {
 			if key == point {
 				continue
@@ -71,6 +72,9 @@ func silver(lines []string) int {
 
 				if isAntinode(candidate, key, point) {
 					antinode.Add(candidate)
+					// since a co-point can have at most one antinode
+					// we can skip to the next point here
+					continue NextPoint
 				}
 			}
 
