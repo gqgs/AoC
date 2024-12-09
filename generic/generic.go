@@ -66,6 +66,10 @@ func (s *Queue[T]) Pop() T {
 	return r
 }
 
+func (s Queue[T]) Empty() bool {
+	return len(s) == 0
+}
+
 type Stack[T any] []T
 
 func (s *Stack[T]) Push(r T) {
@@ -79,8 +83,18 @@ func (s *Stack[T]) Pop() T {
 	return r
 }
 
+func (s *Stack[T]) Peak() T {
+	next := s.Pop()
+	s.Push(next)
+	return next
+}
+
 func (s Stack[T]) Empty() bool {
 	return len(s) == 0
+}
+
+func (s Stack[T]) Len() int {
+	return len(s)
 }
 
 type heap[T any] struct {
