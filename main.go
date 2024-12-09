@@ -36,6 +36,10 @@ func solve() error {
 		lines = append(lines, next)
 	}
 
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
 	println(silver(lines))
 	println(gold(lines))
 
