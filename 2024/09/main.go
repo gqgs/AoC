@@ -86,11 +86,8 @@ func gold(line string) int {
 			})
 		}
 	}
-
-	slices.Reverse(blocks)
-
 Continue:
-	for _, block := range blocks {
+	for _, block := range slices.Backward(blocks) {
 		for _, free := range frees {
 			if block.ID <= free.ID {
 				continue Continue
@@ -106,8 +103,6 @@ Continue:
 			}
 		}
 	}
-
-	slices.Reverse(blocks)
 
 	freeQueue := new(generic.Queue[*Free])
 	for _, free := range frees {
