@@ -6,8 +6,6 @@ import (
 	"os"
 	"slices"
 	"strconv"
-
-	"github.com/gqgs/AoC2021/generic"
 )
 
 func decode(line string) []string {
@@ -104,36 +102,23 @@ Continue:
 		}
 	}
 
-	freeQueue := new(generic.Queue[*Free])
-	for _, free := range frees {
+	memory := make([]int, 0, len(blocks)+len(frees))
+	for i := range min(len(blocks), len(frees)) {
+		block := blocks[i]
+		var id int
+		if !block.Moved {
+			id = block.ID
+		}
+		for range block.Size {
+			memory = append(memory, id)
+		}
+
+		free := frees[i]
+		for _, id := range free.IDS {
+			memory = append(memory, id)
+		}
 		for range free.Size - len(free.IDS) {
-			free.IDS = append(free.IDS, 0)
-		}
-		freeQueue.Push(free)
-	}
-
-	blockQueue := new(generic.Queue[*Block])
-	for _, block := range blocks {
-		blockQueue.Push(block)
-	}
-
-	var memory []int
-	for !freeQueue.Empty() || !blockQueue.Empty() {
-		if !blockQueue.Empty() {
-			block := blockQueue.Pop()
-			var id int
-			if !block.Moved {
-				id = block.ID
-			}
-			for range block.Size {
-				memory = append(memory, id)
-			}
-		}
-		if !freeQueue.Empty() {
-			free := freeQueue.Pop()
-			for _, id := range free.IDS {
-				memory = append(memory, id)
-			}
+			memory = append(memory, 0)
 		}
 	}
 
