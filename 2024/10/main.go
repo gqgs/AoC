@@ -25,7 +25,7 @@ Next:
 	for next := range point.UpRightDownLeft() {
 		if lines[next.X][next.Y]-lines[point.X][point.Y] == 1 {
 			for _, visited := range path {
-				if next.X == visited.X && next.Y == visited.Y {
+				if next.Equal(visited) {
 					// already in path
 					continue Next
 				}

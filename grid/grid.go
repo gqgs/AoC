@@ -16,6 +16,10 @@ func (p Point) String() string {
 	return fmt.Sprintf("(%d,%d)", p.X, p.Y)
 }
 
+func (p Point) Equal(p2 Point) bool {
+	return p.X == p2.X && p.Y == p2.Y
+}
+
 func (p Point) IsOutBounds(limit int) bool {
 	if p.X < 0 || p.Y < 0 {
 		return true
