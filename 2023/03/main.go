@@ -33,14 +33,14 @@ func silver(lines []string) int {
 			var valid bool
 			for !s.Empty() {
 				p := s.Pop()
-				p.AroundFunc(func(ap grid.Point) {
+				for ap := range p.Around() {
 					if _, ok := visited[ap.String()]; ok {
-						return
+						continue
 					}
 					if lines[ap.X][ap.Y] != '.' {
 						valid = true
 					}
-				})
+				}
 			}
 
 			if valid {
@@ -74,15 +74,15 @@ func gold(lines []string) int {
 
 			for !s.Empty() {
 				p := s.Pop()
-				p.AroundFunc(func(ap grid.Point) {
+				for ap := range p.Around() {
 					if _, ok := visited[ap.String()]; ok {
-						return
+						continue
 					}
 					if lines[ap.X][ap.Y] == '*' {
 						digits, _ := strconv.Atoi(number.String())
 						valid[ap.String()] = append(valid[ap.String()], digits)
 					}
-				})
+				}
 			}
 
 			number.Reset()

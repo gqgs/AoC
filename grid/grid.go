@@ -2,6 +2,7 @@ package grid
 
 import (
 	"fmt"
+	"iter"
 	"strings"
 
 	"github.com/gqgs/AoC2021/generic"
@@ -39,12 +40,16 @@ func (p Point) Distance(p2 Point) int {
 	return p.VerticalDist(p2) + p.HorizontalDist(p2)
 }
 
-func (p Point) AroundFunc(fn func(Point)) {
-	for _, ap := range p.around() {
-		fn(Point{
-			X: ap[0],
-			Y: ap[1],
-		})
+func (p Point) Around() iter.Seq[Point] {
+	return func(yield func(Point) bool) {
+		for _, ap := range p.around() {
+			if !yield(Point{
+				X: ap[0],
+				Y: ap[1],
+			}) {
+				return
+			}
+		}
 	}
 }
 
@@ -62,12 +67,16 @@ func (p Point) around() [][2]int {
 	}
 }
 
-func (p Point) UpRightDownLeft(fn func(Point)) {
-	for _, ap := range p.upRightDownLeft() {
-		fn(Point{
-			X: ap[0],
-			Y: ap[1],
-		})
+func (p Point) UpRightDownLeft() iter.Seq[Point] {
+	return func(yield func(Point) bool) {
+		for _, ap := range p.upRightDownLeft() {
+			if !yield(Point{
+				X: ap[0],
+				Y: ap[1],
+			}) {
+				return
+			}
+		}
 	}
 }
 

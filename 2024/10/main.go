@@ -22,21 +22,8 @@ func findPath(lines []string, point grid.Point, path []grid.Point, valid map[str
 	}
 
 Next:
-	for _, possible := range [][2]int{
-		{point.X - 1, point.Y},
-		{point.X, point.Y + 1},
-		{point.X + 1, point.Y},
-		{point.X, point.Y - 1},
-	} {
-		possibleX := possible[0]
-		possibleY := possible[1]
-
-		if lines[possibleX][possibleY]-lines[point.X][point.Y] == 1 {
-			next := grid.Point{
-				X: possibleX,
-				Y: possibleY,
-			}
-
+	for next := range point.UpRightDownLeft() {
+		if lines[next.X][next.Y]-lines[point.X][point.Y] == 1 {
 			for _, visited := range path {
 				if next.X == visited.X && next.Y == visited.Y {
 					// already in path
