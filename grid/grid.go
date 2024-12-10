@@ -39,8 +39,8 @@ func (p Point) Distance(p2 Point) int {
 	return p.VerticalDist(p2) + p.HorizontalDist(p2)
 }
 
-func (p Point) AdjacentFunc(fn func(Point)) {
-	for _, ap := range p.adjacent() {
+func (p Point) AroundFunc(fn func(Point)) {
+	for _, ap := range p.around() {
 		fn(Point{
 			X: ap[0],
 			Y: ap[1],
@@ -48,7 +48,7 @@ func (p Point) AdjacentFunc(fn func(Point)) {
 	}
 }
 
-func (p Point) adjacent() [][2]int {
+func (p Point) around() [][2]int {
 	return [][2]int{
 		{p.X - 1, p.Y - 1},
 		{p.X - 1, p.Y},
@@ -59,6 +59,24 @@ func (p Point) adjacent() [][2]int {
 		{p.X + 1, p.Y - 1},
 		{p.X + 1, p.Y},
 		{p.X + 1, p.Y + 1},
+	}
+}
+
+func (p Point) UpRightDownLeft(fn func(Point)) {
+	for _, ap := range p.upRightDownLeft() {
+		fn(Point{
+			X: ap[0],
+			Y: ap[1],
+		})
+	}
+}
+
+func (p Point) upRightDownLeft() [][2]int {
+	return [][2]int{
+		{p.X - 1, p.Y},
+		{p.X, p.Y + 1},
+		{p.X + 1, p.Y},
+		{p.X, p.Y - 1},
 	}
 }
 

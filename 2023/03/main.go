@@ -33,7 +33,7 @@ func silver(lines []string) int {
 			var valid bool
 			for !s.Empty() {
 				p := s.Pop()
-				p.AdjacentFunc(func(ap grid.Point) {
+				p.AroundFunc(func(ap grid.Point) {
 					if _, ok := visited[ap.String()]; ok {
 						return
 					}
@@ -74,7 +74,7 @@ func gold(lines []string) int {
 
 			for !s.Empty() {
 				p := s.Pop()
-				p.AdjacentFunc(func(ap grid.Point) {
+				p.AroundFunc(func(ap grid.Point) {
 					if _, ok := visited[ap.String()]; ok {
 						return
 					}

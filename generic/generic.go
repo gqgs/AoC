@@ -6,19 +6,19 @@ import (
 	"math/rand"
 )
 
-type set[T comparable] map[T]struct{}
+type Set[T comparable] map[T]struct{}
 
-func (s set[T]) Contains(e T) bool {
+func (s Set[T]) Contains(e T) bool {
 	_, exists := s[e]
 	return exists
 }
 
-func (s *set[T]) Add(e T) {
+func (s *Set[T]) Add(e T) {
 	(*s)[e] = struct{}{}
 }
 
-func (s set[T]) Intersect(s2 set[T]) set[T] {
-	intersection := make(set[T])
+func (s Set[T]) Intersect(s2 Set[T]) Set[T] {
+	intersection := make(Set[T])
 	for ss := range s {
 		if s2.Contains(ss) {
 			intersection.Add(ss)
@@ -27,8 +27,8 @@ func (s set[T]) Intersect(s2 set[T]) set[T] {
 	return intersection
 }
 
-func (s set[T]) Union(s2 set[T]) set[T] {
-	union := make(set[T])
+func (s Set[T]) Union(s2 Set[T]) Set[T] {
+	union := make(Set[T])
 	for ss := range s {
 		union.Add(ss)
 	}
@@ -39,8 +39,8 @@ func (s set[T]) Union(s2 set[T]) set[T] {
 	return union
 }
 
-func NewSet[T comparable](l ...T) set[T] {
-	s := make(set[T])
+func NewSet[T comparable](l ...T) Set[T] {
+	s := make(Set[T])
 	for _, e := range l {
 		s[e] = struct{}{}
 	}
