@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gqgs/AoC2021/generic"
 	"github.com/gqgs/AoC2021/grid"
 )
 
@@ -36,14 +35,14 @@ Next:
 	}
 }
 
-func silver(lines []string) int {
-	stack := new(generic.Stack[grid.Point])
+func findPaths(lines []string) map[string]struct{} {
+	var starts []grid.Point
 	for i := range lines {
 		for j := range lines[i] {
 			if lines[i][j] != '0' {
 				continue
 			}
-			stack.Push(grid.Point{
+			starts = append(starts, grid.Point{
 				X: i,
 				Y: j,
 			})
@@ -51,13 +50,15 @@ func silver(lines []string) int {
 	}
 
 	validPaths := make(map[string]struct{})
-	for !stack.Empty() {
-		next := stack.Pop()
-		findPath(lines, next, []grid.Point{next}, validPaths)
+	for _, start := range starts {
+		findPath(lines, start, []grid.Point{start}, validPaths)
 	}
+	return validPaths
+}
 
+func silver(lines []string) int {
 	score := make(map[string]struct{})
-	for path := range validPaths {
+	for path := range findPaths(lines) {
 		parts := strings.Split(path, "|")
 		start := parts[0]
 		end := parts[len(parts)-1]
@@ -68,31 +69,7 @@ func silver(lines []string) int {
 }
 
 func gold(lines []string) int {
-	stack := new(generic.Stack[grid.Point])
-	for i := range lines {
-		for j := range lines[i] {
-			if lines[i][j] != '0' {
-				continue
-			}
-			stack.Push(grid.Point{
-				X: i,
-				Y: j,
-			})
-		}
-	}
-
-	validPaths := make(map[string]struct{})
-	for !stack.Empty() {
-		next := stack.Pop()
-		findPath(lines, next, []grid.Point{next}, validPaths)
-	}
-
-	score := make(map[string]struct{})
-	for path := range validPaths {
-		score[path] = struct{}{}
-	}
-
-	return len(score)
+	return len(findPaths(lines))
 }
 
 func solve() error {
