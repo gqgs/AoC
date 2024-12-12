@@ -93,6 +93,35 @@ func (p Point) upRightDownLeft() [][2]int {
 	}
 }
 
+func StraightPathExists(p1, p2 Point, lines []string) bool {
+	c := lines[p1.X][p1.Y]
+
+	minx := min(p1.X, p2.X)
+	maxx := max(p1.X, p2.X)
+	if p1.Y == p2.Y {
+		var x int
+		for x = minx; x < maxx && lines[x][p1.Y] == c; x++ {
+		}
+		if x == maxx {
+			return true
+		}
+	}
+
+	miny := min(p1.Y, p2.Y)
+	maxy := max(p1.Y, p2.Y)
+	if p1.X == p2.X {
+		var y int
+		for y = miny; y < maxy && lines[p1.X][y] == c; y++ {
+
+		}
+		if y == maxy {
+			return true
+		}
+	}
+
+	return false
+}
+
 func Points(lines []string, ignoreChar byte) []Point {
 	var points []Point
 	for i := range lines {
@@ -112,11 +141,12 @@ func Points(lines []string, ignoreChar byte) []Point {
 
 func Fill(lines []string, fillChar string, appendSize int) []string {
 	result := make([]string, 0, len(lines)+appendSize)
-	fillLine := strings.Repeat(fillChar, len(lines[0])+appendSize)
+	fillLine := strings.Repeat(fillChar, len(lines[0])+appendSize*2)
 
 	result = append(result, fillLine)
 	for _, line := range lines {
-		result = append(result, fillChar+line+fillChar)
+		str := strings.Repeat(fillChar, appendSize)
+		result = append(result, str+line+str)
 	}
 	result = append(result, fillLine)
 	return result

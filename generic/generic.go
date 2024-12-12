@@ -17,6 +17,10 @@ func (s *Set[T]) Add(e T) {
 	(*s)[e] = struct{}{}
 }
 
+func (s *Set[T]) Len() int {
+	return len(*s)
+}
+
 func (s Set[T]) Intersect(s2 Set[T]) Set[T] {
 	intersection := make(Set[T])
 	for ss := range s {
