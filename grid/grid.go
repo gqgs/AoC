@@ -153,8 +153,13 @@ func Fill(lines []string, fillChar string, appendSize int) []string {
 	return result
 }
 
-func Replace(lines []string, c string, x, y int) []string {
+func Replaced(lines []string, c string, x, y int) []string {
 	clone := slices.Clone(lines)
 	clone[x] = clone[x][:y] + c + clone[x][y+1:]
 	return clone
+}
+
+// Replace character in-place
+func Replace(lines []string, c string, x, y int) {
+	lines[x] = lines[x][:y] + c + lines[x][y+1:]
 }

@@ -107,7 +107,7 @@ func goldAux(start grid.Point, direction int, lines []string, visited, vvisited 
 			stack.Push(np)
 			_, alreadyVisited := vvisited[np.String()]
 			if obstruction == nil && !alreadyVisited {
-				result := goldAux(next, (direction+1)%4, grid.Replace(lines, "O", np.X, np.Y), maps.Clone(visited), maps.Clone(vvisited), &np)
+				result := goldAux(next, (direction+1)%4, grid.Replaced(lines, "O", np.X, np.Y), maps.Clone(visited), maps.Clone(vvisited), &np)
 				obstructions = append(obstructions, result...)
 			}
 		case '#', 'O':
