@@ -10,7 +10,7 @@ import (
 	"github.com/gqgs/AoC2021/grid"
 )
 
-func gold(state []string, moves string) int {
+func gold(lines []string, moves string) int {
 	replacer := strings.NewReplacer(
 		"#", "##",
 		"O", "[]",
@@ -18,8 +18,15 @@ func gold(state []string, moves string) int {
 		"@", "@.",
 	)
 
-	for i := range state {
-		state[i] = replacer.Replace(state[i])
+	for i := range lines {
+		lines[i] = replacer.Replace(lines[i])
+	}
+
+	state := make([][]rune, len(lines))
+	for i, s := range lines {
+		for _, r := range s {
+			state[i] = append(state[i], r)
+		}
 	}
 
 	robot := robotStart(state)
@@ -31,8 +38,8 @@ func gold(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X][robot.Y-1] == '.' {
-				grid.Replace(state, "@", robot.X, robot.Y-1)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X][robot.Y-1] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.Y--
 				continue
 			}
@@ -47,11 +54,11 @@ func gold(state []string, moves string) int {
 				}
 				if found {
 					for ; y < robot.Y; y += 2 {
-						grid.Replace(state, "[", robot.X, y)
-						grid.Replace(state, "]", robot.X, y+1)
+						state[robot.X][y] = '['
+						state[robot.X][y+1] = ']'
 					}
-					grid.Replace(state, "@", robot.X, robot.Y-1)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X][robot.Y-1] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.Y--
 					continue
 				}
@@ -61,8 +68,8 @@ func gold(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X-1][robot.Y] == '.' {
-				grid.Replace(state, "@", robot.X-1, robot.Y)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X-1][robot.Y] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.X--
 				continue
 			}
@@ -101,16 +108,16 @@ func gold(state []string, moves string) int {
 
 				if found && !invalid {
 					for box := range toUpdate {
-						grid.Replace(state, ".", box.X, box.Y)
-						grid.Replace(state, ".", box.X, box.Y+1)
+						state[box.X][box.Y] = '.'
+						state[box.X][box.Y+1] = '.'
 					}
 					for box := range toUpdate {
-						grid.Replace(state, "[", box.X-1, box.Y)
-						grid.Replace(state, "]", box.X-1, box.Y+1)
+						state[box.X-1][box.Y] = '['
+						state[box.X-1][box.Y+1] = ']'
 					}
 
-					grid.Replace(state, "@", robot.X-1, robot.Y)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X-1][robot.Y] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.X--
 				}
 				continue
@@ -120,8 +127,8 @@ func gold(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X+1][robot.Y] == '.' {
-				grid.Replace(state, "@", robot.X+1, robot.Y)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X+1][robot.Y] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.X++
 				continue
 			}
@@ -160,17 +167,16 @@ func gold(state []string, moves string) int {
 
 				if found && !invalid {
 					for box := range toUpdate {
-						grid.Replace(state, ".", box.X, box.Y)
-						grid.Replace(state, ".", box.X, box.Y+1)
+						state[box.X][box.Y] = '.'
+						state[box.X][box.Y+1] = '.'
 					}
 
 					for box := range toUpdate {
-						grid.Replace(state, "[", box.X+1, box.Y)
-						grid.Replace(state, "]", box.X+1, box.Y+1)
+						state[box.X+1][box.Y] = '['
+						state[box.X+1][box.Y+1] = ']'
 					}
-
-					grid.Replace(state, "@", robot.X+1, robot.Y)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X+1][robot.Y] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.X++
 				}
 				continue
@@ -180,8 +186,8 @@ func gold(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X][robot.Y+1] == '.' {
-				grid.Replace(state, "@", robot.X, robot.Y+1)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X][robot.Y+1] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.Y++
 				continue
 			}
@@ -196,11 +202,11 @@ func gold(state []string, moves string) int {
 				}
 				if found {
 					for ; y > robot.Y; y -= 2 {
-						grid.Replace(state, "]", robot.X, y)
-						grid.Replace(state, "[", robot.X, y-1)
+						state[robot.X][y] = ']'
+						state[robot.X][y-1] = '['
 					}
-					grid.Replace(state, "@", robot.X, robot.Y+1)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X][robot.Y+1] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.Y++
 					continue
 				}
@@ -222,7 +228,14 @@ func gold(state []string, moves string) int {
 	return total
 }
 
-func silver(state []string, moves string) int {
+func silver(lines []string, moves string) int {
+	state := make([][]rune, len(lines))
+	for i, s := range lines {
+		for _, r := range s {
+			state[i] = append(state[i], r)
+		}
+	}
+
 	robot := robotStart(state)
 	for _, c := range moves {
 		switch c {
@@ -231,8 +244,8 @@ func silver(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X][robot.Y-1] == '.' {
-				grid.Replace(state, "@", robot.X, robot.Y-1)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X][robot.Y-1] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.Y--
 				continue
 			}
@@ -247,10 +260,10 @@ func silver(state []string, moves string) int {
 				}
 				if found {
 					for ; y < robot.Y; y++ {
-						grid.Replace(state, "O", robot.X, y)
+						state[robot.X][y] = 'O'
 					}
-					grid.Replace(state, "@", robot.X, robot.Y-1)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X][robot.Y-1] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.Y--
 					continue
 				}
@@ -260,8 +273,8 @@ func silver(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X-1][robot.Y] == '.' {
-				grid.Replace(state, "@", robot.X-1, robot.Y)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X-1][robot.Y] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.X--
 				continue
 			}
@@ -276,10 +289,10 @@ func silver(state []string, moves string) int {
 				}
 				if found {
 					for ; x < robot.X; x++ {
-						grid.Replace(state, "O", x, robot.Y)
+						state[x][robot.Y] = 'O'
 					}
-					grid.Replace(state, "@", robot.X-1, robot.Y)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X-1][robot.Y] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.X--
 					continue
 				}
@@ -289,8 +302,8 @@ func silver(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X+1][robot.Y] == '.' {
-				grid.Replace(state, "@", robot.X+1, robot.Y)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X+1][robot.Y] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.X++
 				continue
 			}
@@ -305,10 +318,10 @@ func silver(state []string, moves string) int {
 				}
 				if found {
 					for ; x > robot.X; x-- {
-						grid.Replace(state, "O", x, robot.Y)
+						state[x][robot.Y] = 'O'
 					}
-					grid.Replace(state, "@", robot.X+1, robot.Y)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X+1][robot.Y] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.X++
 					continue
 				}
@@ -318,8 +331,8 @@ func silver(state []string, moves string) int {
 				continue
 			}
 			if state[robot.X][robot.Y+1] == '.' {
-				grid.Replace(state, "@", robot.X, robot.Y+1)
-				grid.Replace(state, ".", robot.X, robot.Y)
+				state[robot.X][robot.Y+1] = '@'
+				state[robot.X][robot.Y] = '.'
 				robot.Y++
 				continue
 			}
@@ -334,10 +347,10 @@ func silver(state []string, moves string) int {
 				}
 				if found {
 					for ; y > robot.Y; y-- {
-						grid.Replace(state, "O", robot.X, y)
+						state[robot.X][y] = 'O'
 					}
-					grid.Replace(state, "@", robot.X, robot.Y+1)
-					grid.Replace(state, ".", robot.X, robot.Y)
+					state[robot.X][robot.Y+1] = '@'
+					state[robot.X][robot.Y] = '.'
 					robot.Y++
 					continue
 				}
@@ -359,7 +372,7 @@ func silver(state []string, moves string) int {
 	return total
 }
 
-func robotStart(state []string) grid.Point {
+func robotStart(state [][]rune) grid.Point {
 	for i := range state {
 		for j := range state[i] {
 			if state[i][j] == '@' {
@@ -396,8 +409,17 @@ func solve() error {
 	stateClone := slices.Clone(state)
 	moves := strings.Join(lines[index:], "")
 
-	println(silver(state, moves))
-	println(gold(stateClone, moves))
+	ch := make(chan int, 2)
+	go func() {
+		ch <- silver(state, moves)
+	}()
+
+	go func() {
+		ch <- gold(stateClone, moves)
+	}()
+
+	println(<-ch)
+	println(<-ch)
 
 	return nil
 }
