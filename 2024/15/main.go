@@ -22,13 +22,7 @@ func gold(lines []string, moves string) int {
 		lines[i] = replacer.Replace(lines[i])
 	}
 
-	state := make([][]rune, len(lines))
-	for i, s := range lines {
-		for _, r := range s {
-			state[i] = append(state[i], r)
-		}
-	}
-
+	state := grid.ParseLines(lines)
 	robot := robotStart(state)
 
 	for _, c := range moves {
@@ -229,13 +223,7 @@ func gold(lines []string, moves string) int {
 }
 
 func silver(lines []string, moves string) int {
-	state := make([][]rune, len(lines))
-	for i, s := range lines {
-		for _, r := range s {
-			state[i] = append(state[i], r)
-		}
-	}
-
+	state := grid.ParseLines(lines)
 	robot := robotStart(state)
 	for _, c := range moves {
 		switch c {

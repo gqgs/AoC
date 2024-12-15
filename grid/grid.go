@@ -159,7 +159,12 @@ func Replaced(lines []string, c string, x, y int) []string {
 	return clone
 }
 
-// Replace character in-place
-func Replace(lines []string, c string, x, y int) {
-	lines[x] = lines[x][:y] + c + lines[x][y+1:]
+func ParseLines(lines []string) [][]rune {
+	state := make([][]rune, len(lines))
+	for i, s := range lines {
+		for _, r := range s {
+			state[i] = append(state[i], r)
+		}
+	}
+	return state
 }
