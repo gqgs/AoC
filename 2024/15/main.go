@@ -18,12 +18,10 @@ func gold(state []string, moves string) int {
 		"@", "@.",
 	)
 
-	var updatedState []string
-	for _, s := range state {
-		updatedState = append(updatedState, replacer.Replace(s))
+	for i := range state {
+		state[i] = replacer.Replace(state[i])
 	}
 
-	state = updatedState
 	robot := robotStart(state)
 
 	for _, c := range moves {
