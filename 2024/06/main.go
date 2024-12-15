@@ -61,19 +61,6 @@ func silver(lines []string) int {
 	}
 }
 
-func replace(lines []string, c string, x, y int) []string {
-	var newLines []string
-	for i := range lines {
-		if i == x {
-			line := lines[i][:y] + c + lines[i][y+1:]
-			newLines = append(newLines, line)
-			continue
-		}
-		newLines = append(newLines, lines[i])
-	}
-	return newLines
-}
-
 func nextPoint(p grid.Point, direction int) grid.Point {
 	var directions = [][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
 	return grid.Point{
@@ -120,7 +107,7 @@ func goldAux(start grid.Point, direction int, lines []string, visited, vvisited 
 			stack.Push(np)
 			_, alreadyVisited := vvisited[np.String()]
 			if obstruction == nil && !alreadyVisited {
-				result := goldAux(next, (direction+1)%4, replace(lines, "O", np.X, np.Y), maps.Clone(visited), maps.Clone(vvisited), &np)
+				result := goldAux(next, (direction+1)%4, grid.Replace(lines, "O", np.X, np.Y), maps.Clone(visited), maps.Clone(vvisited), &np)
 				obstructions = append(obstructions, result...)
 			}
 		case '#', 'O':

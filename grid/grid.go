@@ -151,3 +151,16 @@ func Fill(lines []string, fillChar string, appendSize int) []string {
 	result = append(result, fillLine)
 	return result
 }
+
+func Replace(lines []string, c string, x, y int) []string {
+	var newLines []string
+	for i := range lines {
+		if i == x {
+			line := lines[i][:y] + c + lines[i][y+1:]
+			newLines = append(newLines, line)
+			continue
+		}
+		newLines = append(newLines, lines[i])
+	}
+	return newLines
+}
