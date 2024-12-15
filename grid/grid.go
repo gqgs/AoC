@@ -3,6 +3,7 @@ package grid
 import (
 	"fmt"
 	"iter"
+	"slices"
 	"strings"
 
 	"github.com/gqgs/AoC2021/generic"
@@ -153,14 +154,7 @@ func Fill(lines []string, fillChar string, appendSize int) []string {
 }
 
 func Replace(lines []string, c string, x, y int) []string {
-	var newLines []string
-	for i := range lines {
-		if i == x {
-			line := lines[i][:y] + c + lines[i][y+1:]
-			newLines = append(newLines, line)
-			continue
-		}
-		newLines = append(newLines, lines[i])
-	}
-	return newLines
+	clone := slices.Clone(lines)
+	clone[x] = clone[x][:y] + c + clone[x][y+1:]
+	return clone
 }
