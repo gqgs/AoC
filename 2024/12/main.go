@@ -11,16 +11,8 @@ import (
 
 func silver(lines []string) int {
 	stack := new(generic.Stack[grid.Point])
-	for i := range lines {
-		for j := range lines[i] {
-			if lines[i][j] == '.' {
-				continue
-			}
-			stack.Push(grid.Point{
-				X: i,
-				Y: j,
-			})
-		}
+	for _, point := range grid.Points(lines, '.') {
+		stack.Push(point)
 	}
 
 	perimiter := make(map[string]int)
