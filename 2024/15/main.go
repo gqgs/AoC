@@ -24,17 +24,7 @@ func gold(state []string, moves string) int {
 	}
 
 	state = updatedState
-	var robot grid.Point
-Break:
-	for i := range state {
-		for j := range state[i] {
-			if state[i][j] == '@' {
-				robot.X = i
-				robot.Y = j
-				break Break
-			}
-		}
-	}
+	robot := robotStart(state)
 
 	for _, c := range moves {
 		switch c {
@@ -235,18 +225,7 @@ Break:
 }
 
 func silver(state []string, moves string) int {
-	var robot grid.Point
-Break:
-	for i := range state {
-		for j := range state[i] {
-			if state[i][j] == '@' {
-				robot.X = i
-				robot.Y = j
-				break Break
-			}
-		}
-	}
-
+	robot := robotStart(state)
 	for _, c := range moves {
 		switch c {
 		case '<':
@@ -380,6 +359,20 @@ Break:
 	}
 
 	return total
+}
+
+func robotStart(state []string) grid.Point {
+	for i := range state {
+		for j := range state[i] {
+			if state[i][j] == '@' {
+				return grid.Point{
+					X: i,
+					Y: j,
+				}
+			}
+		}
+	}
+	panic("did not find robot in initial state")
 }
 
 func replace(lines []string, c string, x, y int) []string {
