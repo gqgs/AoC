@@ -67,10 +67,11 @@ func silver(lines []string) int {
 }
 
 func gold(lines []string) int {
+	state := grid.ParseLines(lines)
 	stack := new(generic.Stack[grid.Point])
-	for i := range lines {
-		for j := range lines[i] {
-			if lines[i][j] == '.' {
+	for i := range state {
+		for j := range state[i] {
+			if state[i][j] == '.' {
 				continue
 			}
 			stack.Push(grid.Point{
@@ -132,7 +133,7 @@ func gold(lines []string) int {
 			}
 			for _, nextOrigPoint := range nextOriginPoints {
 				for _, origPoint := range originPoints {
-					if grid.StraightPathExists(nextOrigPoint, origPoint, lines) {
+					if state.StraightPathExists(nextOrigPoint, origPoint) {
 						return true
 					}
 				}
@@ -152,7 +153,7 @@ func gold(lines []string) int {
 			}
 			for _, nextOrigPoint := range nextOriginPoints {
 				for index, origPoint := range originPoints {
-					if grid.StraightPathExists(nextOrigPoint, origPoint, lines) {
+					if state.StraightPathExists(nextOrigPoint, origPoint) {
 						sides[p] = slices.Delete(sides[p], index, index+1)
 						return
 					}

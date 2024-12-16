@@ -9,6 +9,52 @@ import (
 	"github.com/gqgs/AoC2021/generic"
 )
 
+type Grid [][]rune
+
+func (g Grid) FindPosition(char rune) Point {
+	for i := range g {
+		for j := range g[i] {
+			if g[i][j] == char {
+				return Point{
+					X: i,
+					Y: j,
+				}
+			}
+		}
+	}
+
+	panic("char not found")
+}
+
+func (g Grid) StraightPathExists(p1, p2 Point) bool {
+	c := g[p1.X][p1.Y]
+
+	minx := min(p1.X, p2.X)
+	maxx := max(p1.X, p2.X)
+	if p1.Y == p2.Y {
+		var x int
+		for x = minx; x < maxx && g[x][p1.Y] == c; x++ {
+		}
+		if x == maxx {
+			return true
+		}
+	}
+
+	miny := min(p1.Y, p2.Y)
+	maxy := max(p1.Y, p2.Y)
+	if p1.X == p2.X {
+		var y int
+		for y = miny; y < maxy && g[p1.X][y] == c; y++ {
+
+		}
+		if y == maxy {
+			return true
+		}
+	}
+
+	return false
+}
+
 type Point struct {
 	X, Y int
 }
@@ -94,35 +140,6 @@ func (p Point) upRightDownLeft() [][2]int {
 	}
 }
 
-func StraightPathExists(p1, p2 Point, lines []string) bool {
-	c := lines[p1.X][p1.Y]
-
-	minx := min(p1.X, p2.X)
-	maxx := max(p1.X, p2.X)
-	if p1.Y == p2.Y {
-		var x int
-		for x = minx; x < maxx && lines[x][p1.Y] == c; x++ {
-		}
-		if x == maxx {
-			return true
-		}
-	}
-
-	miny := min(p1.Y, p2.Y)
-	maxy := max(p1.Y, p2.Y)
-	if p1.X == p2.X {
-		var y int
-		for y = miny; y < maxy && lines[p1.X][y] == c; y++ {
-
-		}
-		if y == maxy {
-			return true
-		}
-	}
-
-	return false
-}
-
 func Points(lines []string, ignoreChar byte) []Point {
 	var points []Point
 	for i := range lines {
@@ -159,7 +176,7 @@ func Replaced(lines []string, c string, x, y int) []string {
 	return clone
 }
 
-func ParseLines(lines []string) [][]rune {
+func ParseLines(lines []string) Grid {
 	state := make([][]rune, len(lines))
 	for i, s := range lines {
 		for _, r := range s {
