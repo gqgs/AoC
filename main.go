@@ -12,12 +12,12 @@ func silver(lines []string) int {
 	return 0
 }
 
-func gold(lines []string) int {
-	for _, line := range lines {
-		println(line)
-	}
-	return 0
-}
+// func gold(lines []string) int {
+// 	for _, line := range lines {
+// 		println(line)
+// 	}
+// 	return 0
+// }
 
 func solve() error {
 	file, err := os.Open(os.Args[1])
@@ -41,7 +41,7 @@ func solve() error {
 	}
 
 	println(silver(lines))
-	println(gold(lines))
+	// println(gold(lines))
 
 	return nil
 }
