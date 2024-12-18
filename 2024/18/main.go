@@ -15,11 +15,19 @@ func silver(lines []string, gridSize, numberBytes int) int {
 }
 
 func gold(lines []string, gridSize, numberBytes int) string {
-	for i := numberBytes; ; i++ {
-		if shared(lines, gridSize, i) == 0 {
-			return lines[i-1]
+	low := numberBytes
+	high := len(lines)
+	for low < high {
+		// binary search
+		mid := ((high - low) / 2) + 1
+		s := shared(lines, gridSize, low+mid)
+		if s == 0 {
+			high -= mid
+		} else {
+			low += mid
 		}
 	}
+	return lines[low]
 }
 
 func shared(lines []string, gridSize, numberBytes int) int {
@@ -30,7 +38,7 @@ func shared(lines []string, gridSize, numberBytes int) int {
 		points = append(points, point)
 	}
 
-	state := grid.NewSquared(gridSize + 2)
+	state := grid.NewSquared(gridSize)
 	state.FillPerimeter()
 
 	for _, p := range points[:numberBytes] {
