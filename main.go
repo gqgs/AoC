@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"log"
 	"os"
 )
 
@@ -48,6 +49,6 @@ func solve() error {
 
 func main() {
 	if err := solve(); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
