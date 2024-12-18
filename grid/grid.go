@@ -11,6 +11,37 @@ import (
 
 type Grid [][]rune
 
+func ParseLines(lines []string) Grid {
+	state := make([][]rune, len(lines))
+	for i, s := range lines {
+		for _, r := range s {
+			state[i] = append(state[i], r)
+		}
+	}
+	return state
+}
+
+func NewSquared(size int) Grid {
+	state := make(Grid, size+2)
+	for i := range size + 2 {
+		for range size + 2 {
+			state[i] = append(state[i], '.')
+		}
+	}
+	return state
+}
+
+func (g Grid) FillPerimeter() {
+	size := len(g) - 2
+	for i := range size + 2 {
+		for j := range size + 2 {
+			if i == 0 || i == size+1 || j == 0 || j == size+1 {
+				g[i][j] = '#'
+			}
+		}
+	}
+}
+
 func (g Grid) FindPosition(char rune) Point {
 	for i := range g {
 		for j := range g[i] {
@@ -24,6 +55,17 @@ func (g Grid) FindPosition(char rune) Point {
 	}
 
 	panic("char not found")
+}
+
+func (g Grid) String() string {
+	var builder strings.Builder
+	for i := range g {
+		for j := range g[i] {
+			builder.WriteRune(g[j][i])
+		}
+		builder.WriteByte('\n')
+	}
+	return builder.String()
 }
 
 func (g Grid) StraightPathExists(p1, p2 Point) bool {
@@ -56,7 +98,8 @@ func (g Grid) StraightPathExists(p1, p2 Point) bool {
 }
 
 type Point struct {
-	X, Y int
+	X, Y  int
+	Score int
 }
 
 func (p Point) String() string {
@@ -174,14 +217,4 @@ func Replaced(lines []string, c string, x, y int) []string {
 	clone := slices.Clone(lines)
 	clone[x] = clone[x][:y] + c + clone[x][y+1:]
 	return clone
-}
-
-func ParseLines(lines []string) Grid {
-	state := make([][]rune, len(lines))
-	for i, s := range lines {
-		for _, r := range s {
-			state[i] = append(state[i], r)
-		}
-	}
-	return state
 }

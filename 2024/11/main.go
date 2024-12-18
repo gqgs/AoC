@@ -35,7 +35,7 @@ func eval(number int, iter int, cache map[string]int) int {
 func shared(line string, iter int) int {
 	var total int
 	cache := make(map[string]int)
-	for _, number := range ints.FromString(line) {
+	for _, number := range ints.FromString(line, ",") {
 		total += eval(number, iter, cache)
 	}
 	return total

@@ -42,7 +42,7 @@ func silver(lines []string) int {
 		next := minheap.Pop()
 		key := next.String()
 		score, ok := visited[key]
-		if ok && score < next.Dist {
+		if ok && score <= next.Dist {
 			continue
 		}
 		visited[key] = next.Dist
