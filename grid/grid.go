@@ -21,6 +21,7 @@ func ParseLines(lines []string) Grid {
 	return state
 }
 
+// NewSquared creates and returns a grid of size (size+2)x(size+2)
 func NewSquared(size int) Grid {
 	state := make(Grid, size+2)
 	for i := range size + 2 {
