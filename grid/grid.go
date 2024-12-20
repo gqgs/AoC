@@ -32,6 +32,54 @@ func NewSquared(size int) Grid {
 	return state
 }
 
+func (g Grid) ShortestPath(start, end Point) ([]Point, int) {
+	visited := make(map[string]int)
+	minheap := generic.NewMinHeap(func(e1, e2 Point) bool {
+		return e1.Score < e2.Score
+	})
+
+	minheap.Push(Point{
+		X: start.X,
+		Y: start.Y,
+	})
+
+	prev := make(map[string]string)
+
+	for minheap.Len() > 0 {
+		next := minheap.Pop()
+		score, ok := visited[next.String()]
+
+		if ok && score <= next.Score {
+			continue
+		}
+		visited[next.String()] = next.Score
+		prev[next.String()] = next.Prev
+		for move := range next.UpRightDownLeft() {
+			if g[move.X][move.Y] == '#' {
+				continue
+			}
+			move.Score = next.Score + 1
+			move.Prev = next.String()
+			minheap.Push(move)
+		}
+	}
+
+	next := end.String()
+	path := make([]Point, 0)
+	path = append(path, end)
+	for {
+		next = prev[next]
+		if len(next) == 0 {
+			break
+		}
+		var point Point
+		fmt.Sscanf(next, "(%d,%d)", &point.X, &point.Y)
+		path = append([]Point{point}, path...)
+	}
+
+	return path, visited[Point{X: end.X, Y: end.Y}.String()]
+}
+
 func (g Grid) FillPerimeter() {
 	size := len(g) - 2
 	for i := range size + 2 {
@@ -62,7 +110,7 @@ func (g Grid) String() string {
 	var builder strings.Builder
 	for i := range g {
 		for j := range g[i] {
-			builder.WriteRune(g[j][i])
+			builder.WriteRune(g[i][j])
 		}
 		builder.WriteByte('\n')
 	}
@@ -101,6 +149,7 @@ func (g Grid) StraightPathExists(p1, p2 Point) bool {
 type Point struct {
 	X, Y  int
 	Score int
+	Prev  string
 }
 
 func (p Point) String() string {
