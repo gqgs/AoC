@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"maps"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/gqgs/AoC2021/ints"
@@ -102,12 +104,7 @@ func gold(lines []string) int {
 		}
 	}
 
-	var maxValue int
-	for _, v := range values {
-		maxValue = max(maxValue, v)
-	}
-
-	return maxValue
+	return slices.Max(slices.Collect(maps.Values(values)))
 }
 
 func solve() error {
