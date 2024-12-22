@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
+
+	"github.com/gqgs/AoC2021/ints"
 )
 
 func process(secret int) int {
@@ -64,33 +65,18 @@ func encode(list []int) string {
 }
 
 func silver(lines []string) int {
-	var list []int
-	for _, line := range lines {
-		n, _ := strconv.Atoi(line)
-		list = append(list, n)
-	}
-
+	list := ints.FromList(lines)
 	for range 2000 {
 		for i := range list {
 			list[i] = process(list[i])
 		}
 	}
 
-	var result int
-	for _, d := range list {
-		result += d
-	}
-
-	return result
+	return ints.Sum(list)
 }
 
 func gold(lines []string) int {
-	var list []int
-	for _, line := range lines {
-		n, _ := strconv.Atoi(line)
-		list = append(list, n)
-	}
-
+	list := ints.FromList(lines)
 	prices := make([][]int, len(list))
 	for range 2000 {
 		for i := range list {
@@ -104,22 +90,15 @@ func gold(lines []string) int {
 		encodes = append(encodes, encode(diff(p)))
 	}
 
-	var encodingChangeValues []map[string]int
-	existingChanges := make(map[string]struct{})
+	values := make(map[string]int)
 	for i, e := range encodes {
 		encodeChanges := make(map[string]int)
 		for index := len(e) - 4; index >= 0; index-- {
 			substr := e[index : index+4]
-			existingChanges[substr] = struct{}{}
 			encodeChanges[substr] = prices[i][index+4]
 		}
-		encodingChangeValues = append(encodingChangeValues, encodeChanges)
-	}
-
-	values := make(map[string]int)
-	for i := range encodes {
-		for change := range existingChanges {
-			values[change] += encodingChangeValues[i][change]
+		for substr, value := range encodeChanges {
+			values[substr] += value
 		}
 	}
 
@@ -152,8 +131,15 @@ func solve() error {
 		return err
 	}
 
-	println(silver(lines))
-	println(gold(lines))
+	ch := make(chan int, 2)
+	go func() {
+		ch <- silver(lines)
+	}()
+	go func() {
+		ch <- gold(lines)
+	}()
+	println(<-ch)
+	println(<-ch)
 
 	return nil
 }
